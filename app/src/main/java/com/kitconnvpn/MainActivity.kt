@@ -1,14 +1,20 @@
 package com.kitconnvpn
 
+import android.content.Intent
+import android.net.VpnService
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.kitconnvpn.ui.theme.KitConnVPNTheme
@@ -19,29 +25,51 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             KitConnVPNTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Button(
+                        onClick = ::connect
+                    ) {
+                        Text("Подключиться")
+                    }
                 }
             }
         }
     }
-}
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
+    private fun connect() {
+        val intent = VpnService.prepare(this)
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    KitConnVPNTheme {
-        Greeting("Android")
+        if (intent != null) {
+            startActivityForResult(intent, VPN_REQUEST_CODE)
+        } else {
+            startVpn()
+        }
+    }
+
+    private fun startVpn() {
+        startService(
+            Intent(this, KitConnVpnService::class.java)
+        )
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?
+    ) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == VPN_REQUEST_CODE && resultCode == RESULT_OK) {
+            startVpn()
+        }
+    }
+
+    companion object {
+        private const val VPN_REQUEST_CODE = 100
     }
 }
