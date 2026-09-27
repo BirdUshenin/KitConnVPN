@@ -28,21 +28,30 @@ class XrayManager {
         }
     }
 
-    private val controller: CoreController =
-        newCoreController(callback)
+    private var controller: CoreController? = null
 
     fun start(
         config: String,
         tunFd: Int
     ) {
-        controller.startLoop(
+        controller = newCoreController(callback)
+        controller?.startLoop(
             config,
             tunFd
         )
     }
 
     fun stop() {
-        controller.stopLoop()
+        val currentController = controller
+        controller = null
+        if (currentController != null) {
+            try {
+                currentController.stopLoop()
+                Log.d(TAG, "Xray controller stopped")
+            } catch (e: Exception) {
+                Log.e(TAG, "Error stopping Xray controller", e)
+            }
+        }
     }
 
     companion object {
