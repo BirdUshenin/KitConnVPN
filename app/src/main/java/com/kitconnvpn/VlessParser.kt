@@ -22,22 +22,19 @@ object VlessParser {
         val port = uri.port.takeIf { it != -1 }
             ?: error("Port is missing")
 
-        val query = uri.queryParameterNames.associateWith {
-            uri.getQueryParameter(it)
+        val parameters = uri.queryParameterNames.associateWith { key ->
+            uri.getQueryParameter(key).orEmpty()
         }
 
         return VlessConfig(
             uuid = uuid,
             address = address,
             port = port,
-            encryption = query["encryption"] ?: "none",
-            security = query["security"] ?: "none",
-            type = query["type"] ?: "tcp",
-            serverName = query["sni"],
-            fingerprint = query["fp"],
-            publicKey = query["pbk"],
-            shortId = query["sid"],
-            spiderX = query["spx"]
+            encryption = parameters["encryption"] ?: "none",
+            security = parameters["security"] ?: "none",
+            type = parameters["type"] ?: "tcp",
+            parameters = parameters,
+            name = uri.fragment
         )
     }
 }

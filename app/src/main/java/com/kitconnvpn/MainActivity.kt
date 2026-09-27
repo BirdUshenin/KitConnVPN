@@ -7,6 +7,7 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
@@ -64,6 +65,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.lifecycleScope
 import com.kitconnvpn.ui.theme.KitConnVPNTheme
 import kotlinx.coroutines.launch
+import java.util.Locale
 
 class MainActivity : ComponentActivity() {
 
@@ -77,18 +79,37 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             KitConnVPNTheme {
-                VpnMainScreen(
-                    onToggleVpn = { handleToggleVpn() },
-                    onSelectConfig = { config ->
-                        val isConnected = VpnStateRepository.vpnState.value == VpnState.CONNECTED
-                        VpnStateRepository.selectConfig(config)
-                        if (isConnected) {
-                            stopVpnService()
-                            startVpn(config.config)
-                        }
-                    },
-                    onRefreshConfigs = { loadConfigs() }
-                )
+                val isRouteAnimating by VpnStateRepository.isRouteAnimating.collectAsState()
+                val routeProgress by VpnStateRepository.routeProgress.collectAsState()
+                val isSuccessFlash by VpnStateRepository.isSuccessFlash.collectAsState()
+                val selectedConfig by VpnStateRepository.selectedConfig.collectAsState()
+
+                Crossfade(targetState = isRouteAnimating, label = "screen_transition") { animating ->
+                    if (animating) {
+                        AnimatedMapRouteView(
+                            originCity = "Россия (RU)",
+                            destCountry = selectedConfig?.country ?: "Нидерланды",
+                            destFlag = selectedConfig?.let { VpnStateRepository.getCountryFlag(it.country) } ?: "🇳🇱",
+                            progress = routeProgress,
+                            isSuccessFlash = isSuccessFlash
+                        )
+                    } else {
+                        VpnMainScreen(
+                            onToggleVpn = { handleToggleVpn() },
+                            onSelectConfig = { config ->
+                                val isConnected = VpnStateRepository.vpnState.value == VpnState.CONNECTED
+                                VpnStateRepository.selectConfig(config)
+                                if (isConnected) {
+                                    stopVpnService()
+                                    VpnStateRepository.startConnectingAnimation {
+                                        startVpn(config.config)
+                                    }
+                                }
+                            },
+                            onRefreshConfigs = { loadConfigs() }
+                        )
+                    }
+                }
             }
         }
     }
@@ -123,7 +144,9 @@ class MainActivity : ComponentActivity() {
                     loadConfigs()
                     return
                 }
-                startVpn(config.config)
+                VpnStateRepository.startConnectingAnimation {
+                    startVpn(config.config)
+                }
             }
         }
     }
@@ -164,7 +187,11 @@ class MainActivity : ComponentActivity() {
         super.onActivityResult(requestCode, resultCode, data)
 
         if (requestCode == VPN_REQUEST_CODE && resultCode == RESULT_OK) {
-            pendingVlessUrl?.let(::startVpnService)
+            pendingVlessUrl?.let { url ->
+                VpnStateRepository.startConnectingAnimation {
+                    startVpnService(url)
+                }
+            }
             pendingVlessUrl = null
         }
     }
@@ -186,9 +213,14 @@ fun VpnMainScreen(
     val selectedConfig by VpnStateRepository.selectedConfig.collectAsState()
     val isLoadingConfigs by VpnStateRepository.isLoadingConfigs.collectAsState()
 
+    val downloadSpeed by VpnStateRepository.downloadSpeedMb.collectAsState()
+    val uploadSpeed by VpnStateRepository.uploadSpeedMb.collectAsState()
+    val pingMs by VpnStateRepository.pingMs.collectAsState()
+    val totalTrafficMb by VpnStateRepository.totalTrafficMb.collectAsState()
+
     var showBottomSheet by remember { mutableStateOf(false) }
 
-    val backgroundColor = Color(0xFF0D0F14)
+    val backgroundColor = Color(0xFF0C0D14)
 
     Scaffold(
         containerColor = backgroundColor
@@ -226,8 +258,8 @@ fun VpnMainScreen(
                 // Security Status Badge
                 Surface(
                     shape = RoundedCornerShape(20.dp),
-                    color = Color(0xFF181C28),
-                    border = BorderStroke(1.dp, Color(0xFF2A3042))
+                    color = Color(0xFF161824),
+                    border = BorderStroke(1.dp, Color(0xFF262A3E))
                 ) {
                     Row(
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
@@ -240,7 +272,7 @@ fun VpnMainScreen(
                                 .background(
                                     color = when (vpnState) {
                                         VpnState.CONNECTED -> Color(0xFF00E676)
-                                        VpnState.CONNECTING -> Color(0xFFFF9100)
+                                        VpnState.CONNECTING -> Color(0xFF00E5FF)
                                         VpnState.DISCONNECTED -> Color(0xFF546E7A)
                                     },
                                     shape = CircleShape
@@ -259,17 +291,18 @@ fun VpnMainScreen(
                 }
             }
 
+            // Power Gauge Button Section
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
-                modifier = Modifier.padding(vertical = 24.dp)
+                modifier = Modifier.padding(vertical = 16.dp)
             ) {
                 PowerButton(
                     vpnState = vpnState,
                     onClick = onToggleVpn
                 )
 
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
                 // Status Label
                 Text(
@@ -283,12 +316,12 @@ fun VpnMainScreen(
                     letterSpacing = 1.2.sp,
                     color = when (vpnState) {
                         VpnState.CONNECTED -> Color(0xFF00E676)
-                        VpnState.CONNECTING -> Color(0xFFFF9100)
-                        VpnState.DISCONNECTED -> Color(0xFF8C9BAE)
+                        VpnState.CONNECTING -> Color(0xFF00E5FF)
+                        VpnState.DISCONNECTED -> Color(0xFF8A93A6)
                     }
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(6.dp))
 
                 // Timer Display
                 Text(
@@ -305,13 +338,20 @@ fun VpnMainScreen(
                 )
             }
 
-            // Bottom Section: Server Selection Card & Protocol Info
+            // Bottom Section: Speed/Traffic Cards & Server Selection Card
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 12.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                    .padding(bottom = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
+                SpeedMetricsGrid(
+                    downloadSpeed = if (vpnState == VpnState.CONNECTED) downloadSpeed else "0.0",
+                    uploadSpeed = if (vpnState == VpnState.CONNECTED) uploadSpeed else "0.0",
+                    pingMs = if (vpnState == VpnState.CONNECTED) pingMs else 0,
+                    totalTrafficMb = if (vpnState == VpnState.CONNECTED) totalTrafficMb else 0.0
+                )
+
                 // Server Selector Card
                 Surface(
                     onClick = {
@@ -322,14 +362,14 @@ fun VpnMainScreen(
                         }
                     },
                     shape = RoundedCornerShape(20.dp),
-                    color = Color(0xFF161B26),
-                    border = BorderStroke(1.dp, Color(0xFF283044)),
+                    color = Color(0xFF161824),
+                    border = BorderStroke(1.dp, Color(0xFF262A3E)),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp),
+                            .padding(14.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
@@ -339,8 +379,8 @@ fun VpnMainScreen(
                         ) {
                             if (isLoadingConfigs) {
                                 CircularProgressIndicator(
-                                    modifier = Modifier.size(28.dp),
-                                    color = Color(0xFF00E676),
+                                    modifier = Modifier.size(26.dp),
+                                    color = Color(0xFF00E5FF),
                                     strokeWidth = 2.dp
                                 )
                             } else {
@@ -349,7 +389,7 @@ fun VpnMainScreen(
                                 } ?: "🌐"
                                 Text(
                                     text = flag,
-                                    fontSize = 28.sp
+                                    fontSize = 26.sp
                                 )
                             }
 
@@ -364,53 +404,15 @@ fun VpnMainScreen(
                                 Text(
                                     text = selectedConfig?.subtitle ?: "Нажмите для выбора страны",
                                     style = MaterialTheme.typography.bodySmall,
-                                    color = Color(0xFF8C9BAE)
+                                    color = Color(0xFF8A93A6)
                                 )
                             }
                         }
 
-                        // Arrow down icon
                         Text(
                             text = "▼",
-                            color = Color(0xFF8C9BAE),
+                            color = Color(0xFF8A93A6),
                             fontSize = 12.sp
-                        )
-                    }
-                }
-
-                // Protocol & encryption footer info
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceAround,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(6.dp)
-                    ) {
-                        Text(
-                            text = "⚡",
-                            fontSize = 14.sp
-                        )
-                        Text(
-                            text = "Brid",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = Color(0xFF8C9BAE)
-                        )
-                    }
-
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(6.dp)
-                    ) {
-                        Text(
-                            text = "🔒",
-                            fontSize = 14.sp
-                        )
-                        Text(
-                            text = "WYY, RY, TC",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = Color(0xFF8C9BAE)
                         )
                     }
                 }
@@ -427,6 +429,92 @@ fun VpnMainScreen(
             },
             onDismiss = { showBottomSheet = false }
         )
+    }
+}
+
+@Composable
+fun SpeedMetricsGrid(
+    downloadSpeed: String,
+    uploadSpeed: String,
+    pingMs: Int,
+    totalTrafficMb: Double
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            MetricCard(
+                title = "СКАЧИВАНИЕ",
+                value = "$downloadSpeed Мб/с",
+                icon = "📥",
+                modifier = Modifier.weight(1f)
+            )
+            MetricCard(
+                title = "ОТДАЧА",
+                value = "$uploadSpeed Мб/с",
+                icon = "📤",
+                modifier = Modifier.weight(1f)
+            )
+        }
+
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            MetricCard(
+                title = "ПИНГ",
+                value = if (pingMs > 0) "$pingMs мс" else "--",
+                icon = "⚡",
+                modifier = Modifier.weight(1f)
+            )
+            MetricCard(
+                title = " ТРАФИК",
+                value = String.format(Locale.US, "%.1f МБ", totalTrafficMb),
+                icon = "📊",
+                modifier = Modifier.weight(1f)
+            )
+        }
+    }
+}
+
+@Composable
+fun MetricCard(
+    title: String,
+    value: String,
+    icon: String,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        shape = RoundedCornerShape(16.dp),
+        color = Color(0xFF161824),
+        border = BorderStroke(1.dp, Color(0xFF262A3E)),
+        modifier = modifier
+    ) {
+        Row(
+            modifier = Modifier.padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(text = icon, fontSize = 18.sp)
+            Column {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.labelSmall,
+                    fontSize = 9.sp,
+                    color = Color(0xFF8A93A6)
+                )
+                Text(
+                    text = value,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+            }
+        }
     }
 }
 
@@ -449,29 +537,22 @@ fun PowerButton(
 
     val pulseScale by infiniteTransition.animateFloat(
         initialValue = 1f,
-        targetValue = 1.18f,
+        targetValue = 1.15f,
         animationSpec = infiniteRepeatable(
-            animation = tween(1200, easing = FastOutSlowInEasing),
+            animation = tween(1000, easing = FastOutSlowInEasing),
             repeatMode = RepeatMode.Reverse
         ),
         label = "pulse"
     )
 
-    val targetColor = when (vpnState) {
-        VpnState.CONNECTED -> Color(0xFF00E676)
-        VpnState.CONNECTING -> Color(0xFFFF9100)
-        VpnState.DISCONNECTED -> Color(0xFF455A64)
-    }
-
-    val animatedColor by animateColorAsState(
-        targetValue = targetColor,
-        animationSpec = tween(500),
-        label = "color"
-    )
+    val cyan = Color(0xFF00E5FF)
+    val purple = Color(0xFF7C4DFF)
+    val pink = Color(0xFFFF007F)
+    val green = Color(0xFF00E676)
 
     Box(
         modifier = modifier
-            .size(210.dp)
+            .size(200.dp)
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
@@ -479,7 +560,6 @@ fun PowerButton(
             ),
         contentAlignment = Alignment.Center
     ) {
-        // Outer pulsing aura when connected
         if (vpnState == VpnState.CONNECTED) {
             Box(
                 modifier = Modifier
@@ -487,66 +567,81 @@ fun PowerButton(
                     .graphicsLayer {
                         scaleX = pulseScale
                         scaleY = pulseScale
-                        alpha = 0.25f
+                        alpha = 0.3f
                     }
                     .background(
-                        color = Color(0xFF00E676),
+                        brush = Brush.radialGradient(
+                            colors = listOf(green, Color.Transparent)
+                        ),
                         shape = CircleShape
                     )
             )
         }
 
-        // Rotating arc when connecting or static border
         Canvas(modifier = Modifier.fillMaxSize()) {
-            val strokeWidth = 8.dp.toPx()
-            val radius = (size.minDimension - strokeWidth) / 2
+            val strokeWidth = 10.dp.toPx()
 
             if (vpnState == VpnState.CONNECTING) {
                 rotate(rotationAngle) {
                     drawArc(
                         brush = Brush.sweepGradient(
                             colors = listOf(
-                                Color(0xFFFF9100).copy(alpha = 0.1f),
-                                Color(0xFFFF9100),
-                                Color(0xFFFF9100).copy(alpha = 0.1f)
+                                cyan.copy(alpha = 0.1f),
+                                cyan,
+                                purple,
+                                pink,
+                                cyan.copy(alpha = 0.1f)
                             )
                         ),
                         startAngle = 0f,
-                        sweepAngle = 280f,
+                        sweepAngle = 290f,
                         useCenter = false,
                         style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
                     )
                 }
+            } else if (vpnState == VpnState.CONNECTED) {
+                drawArc(
+                    brush = Brush.sweepGradient(
+                        colors = listOf(cyan, purple, pink, green, cyan)
+                    ),
+                    startAngle = 135f,
+                    sweepAngle = 270f,
+                    useCenter = false,
+                    style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
+                )
             } else {
-                drawCircle(
-                    color = animatedColor.copy(alpha = if (vpnState == VpnState.CONNECTED) 0.8f else 0.3f),
-                    radius = radius,
-                    style = Stroke(width = strokeWidth)
+                drawArc(
+                    color = Color(0xFF23283B),
+                    startAngle = 135f,
+                    sweepAngle = 270f,
+                    useCenter = false,
+                    style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
                 )
             }
         }
 
-        // Inner circular button container
         Surface(
-            modifier = Modifier.size(155.dp),
+            modifier = Modifier.size(145.dp),
             shape = CircleShape,
-            color = Color(0xFF161B26),
+            color = Color(0xFF12141F),
             tonalElevation = 8.dp,
             shadowElevation = 12.dp,
-            border = BorderStroke(1.5.dp, animatedColor.copy(alpha = 0.5f))
+            border = BorderStroke(
+                1.5.dp,
+                if (vpnState == VpnState.CONNECTED) green else Color(0xFF2B3147)
+            )
         ) {
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier.fillMaxSize()
             ) {
-                // Inner radial glow
                 Box(
                     modifier = Modifier
-                        .size(110.dp)
+                        .size(100.dp)
                         .background(
                             brush = Brush.radialGradient(
                                 colors = listOf(
-                                    animatedColor.copy(alpha = 0.28f),
+                                    if (vpnState == VpnState.CONNECTED) green.copy(alpha = 0.25f) else purple.copy(alpha = 0.2f),
                                     Color.Transparent
                                 )
                             ),
@@ -554,10 +649,13 @@ fun PowerButton(
                         )
                 )
 
-                // Canvas Power Icon
-                Canvas(modifier = Modifier.size(52.dp)) {
-                    val iconColor = if (vpnState == VpnState.DISCONNECTED) Color(0xFFB0BEC5) else animatedColor
-                    val stroke = 5.dp.toPx()
+                Canvas(modifier = Modifier.size(48.dp)) {
+                    val iconColor = when (vpnState) {
+                        VpnState.CONNECTED -> green
+                        VpnState.CONNECTING -> cyan
+                        VpnState.DISCONNECTED -> Color(0xFF8A93A6)
+                    }
+                    val stroke = 4.5.dp.toPx()
 
                     drawArc(
                         color = iconColor,
@@ -588,9 +686,18 @@ fun CountrySelectorSheet(
     onSelect: (VpnConfig) -> Unit,
     onDismiss: () -> Unit
 ) {
+    val serverPings by VpnStateRepository.serverPings.collectAsState()
+    val isPingingAll by VpnStateRepository.isPingingAll.collectAsState()
+
+    LaunchedEffect(Unit) {
+        if (serverPings.isEmpty()) {
+            VpnStateRepository.pingAllServers()
+        }
+    }
+
     ModalBottomSheet(
         onDismissRequest = onDismiss,
-        containerColor = Color(0xFF161B26),
+        containerColor = Color(0xFF161824),
         contentColor = Color.White
     ) {
         Column(
@@ -598,13 +705,62 @@ fun CountrySelectorSheet(
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp, vertical = 12.dp)
         ) {
-            Text(
-                text = "Выберите локацию",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                color = Color.White,
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
+            // Header Row with Title & Ping Test Button
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        text = "∨",
+                        color = Color(0xFF8A93A6),
+                        fontSize = 14.sp
+                    )
+                    Text(
+                        text = "Список серверов",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                }
+
+                Surface(
+                    onClick = { VpnStateRepository.pingAllServers() },
+                    shape = CircleShape,
+                    color = Color(0xFF222638),
+                    border = BorderStroke(1.dp, Color(0xFF323850))
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        if (isPingingAll) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(14.dp),
+                                color = Color(0xFF00E5FF),
+                                strokeWidth = 2.dp
+                            )
+                        } else {
+                            Text(
+                                text = "⏱️",
+                                fontSize = 14.sp
+                            )
+                        }
+                        Text(
+                            text = if (isPingingAll) "Замер..." else "Тест пинга",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Color.White
+                        )
+                    }
+                }
+            }
 
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -613,6 +769,7 @@ fun CountrySelectorSheet(
                 items(configs) { item ->
                     val isSelected = item == selectedConfig
                     val flag = VpnStateRepository.getCountryFlag(item.country)
+                    val pingValue = serverPings[item.config]
 
                     Surface(
                         onClick = {
@@ -623,20 +780,21 @@ fun CountrySelectorSheet(
                         color = if (isSelected) Color(0xFF222B3D) else Color(0xFF10141D),
                         border = BorderStroke(
                             1.dp,
-                            if (isSelected) Color(0xFF00E676) else Color(0xFF2A3042)
+                            if (isSelected) Color(0xFF00E676) else Color(0xFF262A3E)
                         ),
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(16.dp),
+                                .padding(14.dp),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(14.dp)
+                                horizontalArrangement = Arrangement.spacedBy(14.dp),
+                                modifier = Modifier.weight(1f)
                             ) {
                                 Text(
                                     text = flag,
@@ -649,22 +807,51 @@ fun CountrySelectorSheet(
                                         fontWeight = FontWeight.SemiBold,
                                         color = Color.White
                                     )
-                                    if (item.subtitle.isNotEmpty()) {
-                                        Text(
-                                            text = item.subtitle,
-                                            style = MaterialTheme.typography.bodySmall,
-                                            color = Color(0xFF8C9BAE)
-                                        )
-                                    }
+                                    Text(
+                                        text = item.subtitle.ifEmpty { "VLESS" },
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = Color(0xFF8A93A6)
+                                    )
                                 }
                             }
 
-                            if (isSelected) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                if (serverPings.containsKey(item.config) && pingValue == null && isPingingAll) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(14.dp),
+                                        color = Color(0xFF00E5FF),
+                                        strokeWidth = 2.dp
+                                    )
+                                } else {
+                                    val pingText = when {
+                                        pingValue == null -> ""
+                                        pingValue > 0 -> "$pingValue мс"
+                                        else -> "n/a"
+                                    }
+                                    val pingColor = when {
+                                        pingValue == null -> Color(0xFF8A93A6)
+                                        pingValue in 1..250 -> Color(0xFF00E676)
+                                        pingValue in 251..500 -> Color(0xFFFFB300)
+                                        pingValue > 500 -> Color(0xFFFF5252)
+                                        else -> Color(0xFF8A93A6)
+                                    }
+
+                                    Text(
+                                        text = pingText,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = pingColor,
+                                        fontWeight = FontWeight.Medium
+                                    )
+                                }
+
                                 Text(
-                                    text = "✓",
-                                    color = Color(0xFF00E676),
+                                    text = if (isSelected) "✓" else "›",
+                                    color = if (isSelected) Color(0xFF00E676) else Color(0xFF546E7A),
                                     fontWeight = FontWeight.Bold,
-                                    fontSize = 18.sp
+                                    fontSize = if (isSelected) 18.sp else 20.sp
                                 )
                             }
                         }
