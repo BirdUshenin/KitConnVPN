@@ -60,12 +60,12 @@ class KitConnVpnService : VpnService() {
         try {
             val vlessConfig = VlessParser.parse(vlessUrl)
             val xrayConfig = XrayConfigBuilder.build(vlessConfig)
-
-            xrayManager?.start(
-                config = xrayConfig,
-                tunFd = vpnInterface!!.fd
-            )
-
+            vpnInterface?.let { vpnInterface ->
+                xrayManager?.start(
+                    config = xrayConfig,
+                    tunFd = vpnInterface.fd
+                )
+            }
             Log.d(TAG, "Xray started successfully")
             VpnStateRepository.onVpnStarted()
         } catch (e: Exception) {

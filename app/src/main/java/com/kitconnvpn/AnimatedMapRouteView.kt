@@ -53,12 +53,10 @@ fun AnimatedMapRouteView(
             .background(backgroundColor),
         contentAlignment = Alignment.Center
     ) {
-        // Dark Map Grid Canvas & Route Line
         Canvas(modifier = Modifier.fillMaxSize()) {
             val w = size.width
             val h = size.height
 
-            // 1. Draw subtle background grid lines
             val gridStep = 48.dp.toPx()
             val gridColor = Color(0xFF1B1E2E).copy(alpha = 0.5f)
 
@@ -102,14 +100,12 @@ fun AnimatedMapRouteView(
             pathMeasure.setPath(routePath, false)
             val totalLength = pathMeasure.length
 
-            // Base track path line
             drawPath(
                 path = routePath,
                 color = Color(0xFF262B3F),
                 style = Stroke(width = 4.dp.toPx(), cap = StrokeCap.Round)
             )
 
-            // Animated partial route line
             if (progress > 0f) {
                 val animatedSegment = Path()
                 pathMeasure.getSegment(0f, totalLength * progress, animatedSegment, true)
@@ -136,7 +132,6 @@ fun AnimatedMapRouteView(
                     style = Stroke(width = 7.dp.toPx(), cap = StrokeCap.Round)
                 )
 
-                // Glowing particle head at the front of the route
                 if (progress < 1f || isSuccessFlash) {
                     val currentPos = pathMeasure.getPosition(totalLength * progress)
                     drawCircle(
@@ -152,7 +147,6 @@ fun AnimatedMapRouteView(
                 }
             }
 
-            // Draw intermediate node dots
             val nodes = listOf(p1, p2, p3, p4)
             nodes.forEachIndexed { idx, point ->
                 val nodeReached = progress >= (idx.toFloat() / (nodes.size - 1))
@@ -175,7 +169,6 @@ fun AnimatedMapRouteView(
             }
         }
 
-        // Top Header Info Card
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -224,7 +217,6 @@ fun AnimatedMapRouteView(
                 }
             }
 
-            // Bottom Progress Card
             Surface(
                 shape = RoundedCornerShape(24.dp),
                 color = Color(0xFF161824).copy(alpha = 0.95f),
@@ -259,7 +251,6 @@ fun AnimatedMapRouteView(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    // Linear progress bar with neon gradient
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()

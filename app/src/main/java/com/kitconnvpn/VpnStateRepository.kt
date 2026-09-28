@@ -66,12 +66,19 @@ object VpnStateRepository {
     private val _isPingingAll = MutableStateFlow(false)
     val isPingingAll: StateFlow<Boolean> = _isPingingAll.asStateFlow()
 
+    private val _isUpdateRequired = MutableStateFlow(false)
+    val isUpdateRequired: StateFlow<Boolean> = _isUpdateRequired.asStateFlow()
+
     private var timerJob: Job? = null
     private var animJob: Job? = null
     private val scope = CoroutineScope(Dispatchers.Main)
 
     fun setLoadingConfigs(loading: Boolean) {
         _isLoadingConfigs.value = loading
+    }
+
+    fun setRequireUpdate(required: Boolean) {
+        _isUpdateRequired.value = required
     }
 
     fun setConfigs(list: List<VpnConfig>) {
@@ -233,7 +240,7 @@ object VpnStateRepository {
         return if (total != TrafficStats.UNSUPPORTED.toLong()) total else TrafficStats.getUidTxBytes(Process.myUid())
     }
 
-    private fun getServerHost(): String? {
+    fun getServerHost(): String? {
         val vlessUrl = _selectedConfig.value?.config ?: return null
         return try {
             VlessParser.parse(vlessUrl).address
@@ -285,6 +292,7 @@ object VpnStateRepository {
         val code = when (country.trim().lowercase()) {
             "netherlands", "нидерланды", "nl" -> "NL"
             "italy", "италия", "it" -> "IT"
+            "poland", "польша", "pl" -> "PL"
             "germany", "германия", "de" -> "DE"
             "usa", "united states", "сша", "us" -> "US"
             "finland", "финляндия", "fi" -> "FI"
