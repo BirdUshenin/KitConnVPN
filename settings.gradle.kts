@@ -24,4 +24,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "KitConnVPN"
 include(":app")
+include(":vpn")
  

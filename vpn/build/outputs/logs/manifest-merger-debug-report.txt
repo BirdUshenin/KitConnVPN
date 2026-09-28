@@ -1,0 +1,40 @@
+-- Merging decision tree log ---
+manifest
+ADDED from /Users/ilya/AndroidStudioProjects/KitConnVPN/vpn/src/main/AndroidManifest.xml:2:1-18:12
+INJECTED from /Users/ilya/AndroidStudioProjects/KitConnVPN/vpn/src/main/AndroidManifest.xml:2:1-18:12
+	package
+		INJECTED from /Users/ilya/AndroidStudioProjects/KitConnVPN/vpn/src/main/AndroidManifest.xml
+	xmlns:android
+		ADDED from /Users/ilya/AndroidStudioProjects/KitConnVPN/vpn/src/main/AndroidManifest.xml:2:11-69
+uses-permission#android.permission.INTERNET
+ADDED from /Users/ilya/AndroidStudioProjects/KitConnVPN/vpn/src/main/AndroidManifest.xml:4:5-67
+	android:name
+		ADDED from /Users/ilya/AndroidStudioProjects/KitConnVPN/vpn/src/main/AndroidManifest.xml:4:22-64
+uses-permission#android.permission.FOREGROUND_SERVICE
+ADDED from /Users/ilya/AndroidStudioProjects/KitConnVPN/vpn/src/main/AndroidManifest.xml:5:5-77
+	android:name
+		ADDED from /Users/ilya/AndroidStudioProjects/KitConnVPN/vpn/src/main/AndroidManifest.xml:5:22-74
+application
+ADDED from /Users/ilya/AndroidStudioProjects/KitConnVPN/vpn/src/main/AndroidManifest.xml:7:5-16:19
+service#com.kitconnvpn.KitConnVpnService
+ADDED from /Users/ilya/AndroidStudioProjects/KitConnVPN/vpn/src/main/AndroidManifest.xml:8:9-15:19
+	android:exported
+		ADDED from /Users/ilya/AndroidStudioProjects/KitConnVPN/vpn/src/main/AndroidManifest.xml:11:13-37
+	android:permission
+		ADDED from /Users/ilya/AndroidStudioProjects/KitConnVPN/vpn/src/main/AndroidManifest.xml:10:13-69
+	android:name
+		ADDED from /Users/ilya/AndroidStudioProjects/KitConnVPN/vpn/src/main/AndroidManifest.xml:9:13-60
+intent-filter#action:name:android.net.VpnService
+ADDED from /Users/ilya/AndroidStudioProjects/KitConnVPN/vpn/src/main/AndroidManifest.xml:12:13-14:29
+action#android.net.VpnService
+ADDED from /Users/ilya/AndroidStudioProjects/KitConnVPN/vpn/src/main/AndroidManifest.xml:13:17-65
+	android:name
+		ADDED from /Users/ilya/AndroidStudioProjects/KitConnVPN/vpn/src/main/AndroidManifest.xml:13:25-62
+uses-sdk
+INJECTED from /Users/ilya/AndroidStudioProjects/KitConnVPN/vpn/src/main/AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from /Users/ilya/AndroidStudioProjects/KitConnVPN/vpn/src/main/AndroidManifest.xml
+INJECTED from /Users/ilya/AndroidStudioProjects/KitConnVPN/vpn/src/main/AndroidManifest.xml
+	android:targetSdkVersion
+		INJECTED from /Users/ilya/AndroidStudioProjects/KitConnVPN/vpn/src/main/AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from /Users/ilya/AndroidStudioProjects/KitConnVPN/vpn/src/main/AndroidManifest.xml
