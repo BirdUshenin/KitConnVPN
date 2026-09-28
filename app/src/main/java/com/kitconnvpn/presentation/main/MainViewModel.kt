@@ -59,11 +59,11 @@ class MainViewModel(
             repository.uploadSpeedMb,
             repository.pingMs,
             repository.totalTrafficMb
-        ) { updateReq, dl, ul, ping, traffic ->
+        ) { updateReq, downloadSpeed, upload, ping, traffic ->
             _uiState.value = _uiState.value.copy(
                 isUpdateRequired = updateReq,
-                downloadSpeedMb = dl,
-                uploadSpeedMb = ul,
+                downloadSpeedMb = downloadSpeed,
+                uploadSpeedMb = upload,
                 pingMs = ping,
                 totalTrafficMb = traffic
             )

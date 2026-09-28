@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
+    <defs>
+        <linearGradient id="catGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#00d2ff" />
+            <stop offset="50%" stop-color="#3a7bd5" />
+            <stop offset="100%" stop-color="#8e2de2" />
+        </linearGradient>
+
+        <linearGradient id="tailGradient" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#4a00e0" />
+            <stop offset="100%" stop-color="#da22ff" />
+        </linearGradient>
+
+        <linearGradient id="earGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#7b2cbf" />
+            <stop offset="100%" stop-color="#3a0ca3" />
+        </linearGradient>
+    </defs>
+
+    <g stroke="#101018" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
+
+        <path d="M 330 380 C 370 380 410 320 400 230 C 395 180 360 150 345 160 C 330 170 350 210 355 240 C 365 290 335 330 300 345"
+            fill="url(#tailGradient)" />
+
+        <path d="M 160 380 C 120 380 110 300 150 280 C 180 260 210 300 200 380 Z" fill="url(#catGradient)" />
+        <path d="M 340 380 C 380 380 390 300 350 280 C 320 260 290 300 300 380 Z" fill="url(#catGradient)" />
+
+        <path d="M 170 250 C 160 320 175 410 210 410 L 290 410 C 325 410 340 320 330 250 C 310 220 190 220 170 250 Z"
+            fill="url(#catGradient)" />
+
+        <path d="M 220 310 L 220 410" fill="none" />
+        <path d="M 280 310 L 280 410" fill="none" />
+        <path d="M 250 330 L 250 410" fill="none" stroke-width="6" />
+
+        <path d="M 205 410 C 205 395 235 395 235 410" fill="none" stroke-width="5" />
+        <path d="M 265 410 C 265 395 295 395 295 410" fill="none" stroke-width="5" />
+        <path d="M 140 410 C 140 395 170 395 170 410" fill="none" stroke-width="5" />
+        <path d="M 330 410 C 330 395 360 395 360 410" fill="none" stroke-width="5" />
+
+        <path d="M 160 150 L 140 75 L 210 110 Z" fill="url(#catGradient)" />
+        <path d="M 340 150 L 360 75 L 290 110 Z" fill="url(#catGradient)" />
+
+        <path d="M 165 140 L 152 90 L 200 115 Z" fill="url(#earGradient)" stroke="none" />
+        <path d="M 335 140 L 348 90 L 300 115 Z" fill="url(#earGradient)" stroke="none" />
+
+        <ellipse cx="250" cy="180" rx="95" ry="80" fill="url(#catGradient)" />
+
+        <ellipse cx="205" cy="175" rx="12" ry="16" fill="#101018" stroke="none" />
+        <ellipse cx="295" cy="175" rx="12" ry="16" fill="#101018" stroke="none" />
+        <circle cx="201" cy="170" r="4" fill="#ffffff" stroke="none" />
+        <circle cx="291" cy="170" r="4" fill="#ffffff" stroke="none" />
+
+        <path d="M 242 192 Q 250 188 258 192 Q 250 202 242 192 Z" fill="#101018" stroke="none" />
+
+        <path d="M 232 205 Q 241 217 250 205 Q 259 217 268 205" fill="none" stroke-width="7" />
+
+        <path d="M 160 180 L 110 170" fill="none" stroke-width="6" />
+        <path d="M 155 195 L 100 195" fill="none" stroke-width="6" />
+        <path d="M 160 210 L 115 220" fill="none" stroke-width="6" />
+
+        <path d="M 340 180 L 390 170" fill="none" stroke-width="6" />
+        <path d="M 345 195 L 400 195" fill="none" stroke-width="6" />
+        <path d="M 340 210 L 385 220" fill="none" stroke-width="6" />
+    </g>
+</svg>
