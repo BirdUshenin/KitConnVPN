@@ -59,15 +59,10 @@ vpn/    VpnService, запуск Xray, разбор VLESS-ссылок, сост
 ./gradlew :app:assembleRelease    # release (минификация R8), нужна подпись
 ```
 
-Токен API в `NetworkModule.kt` в репозиторий не коммитится: поле `API_TOKEN` оставляйте пустым в git и задавайте локально.
+Токен API в `NetworkModule.kt` `API_TOKEN` пустой, `BASE_URL` замените на свой.
 
 ## Установка
 
 1. Скачайте APK из раздела [Releases](../../releases) и откройте его на телефоне (разрешите установку из неизвестных источников).
 2. При первом подключении подтвердите системный запрос на добавление VPN-конфигурации.
 3. На Android 13 и новее разрешите уведомления: без них не будет статуса в шторке.
-
-## Благодарности
-
-- [Xray-core](https://github.com/XTLS/Xray-core) — ядро VLESS / Reality / XHTTP
-- Kotlin и Jetpack Compose
