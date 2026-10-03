@@ -1,0 +1,4 @@
+-dontwarn com.kitconnvpn.VpnState
+-dontwarn com.kitconnvpn.VpnStateRepository
+-dontwarn com.kitconnvpn.core.model.VpnConfig
+-dontwarn com.kitconnvpn.core.model.VpnConfigsResponse

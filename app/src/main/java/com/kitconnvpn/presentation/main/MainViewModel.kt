@@ -16,7 +16,6 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
-
 import kotlinx.coroutines.launch
 
 class MainViewModel(
@@ -71,17 +70,11 @@ class MainViewModel(
 
         combine(
             repository.serverPings,
-            repository.isPingingAll,
-            repository.isRouteAnimating,
-            repository.routeProgress,
-            repository.isSuccessFlash
-        ) { pings, isPinging, animating, progress, successFlash ->
+            repository.isPingingAll
+        ) { pings, isPinging ->
             _uiState.value = _uiState.value.copy(
                 serverPings = pings,
-                isPingingAll = isPinging,
-                isRouteAnimating = animating,
-                routeProgress = progress,
-                isSuccessFlash = successFlash
+                isPingingAll = isPinging
             )
         }.launchIn(viewModelScope)
     }
@@ -131,9 +124,8 @@ class MainViewModel(
                     loadConfigs()
                     return
                 }
-                repository.startConnectingAnimation {
-                    onStartService?.invoke(config.config)
-                }
+                // Анимацию запускает Activity уже после выдачи разрешения VPN
+                onStartService?.invoke(config.config)
             }
         }
     }
@@ -143,9 +135,7 @@ class MainViewModel(
         repository.selectConfig(config)
         if (isConnected) {
             onStopService?.invoke()
-            repository.startConnectingAnimation {
-                onStartService?.invoke(config.config)
-            }
+            onStartService?.invoke(config.config)
         }
     }
 

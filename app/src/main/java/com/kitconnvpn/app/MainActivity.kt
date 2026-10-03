@@ -1,6 +1,11 @@
 package com.kitconnvpn.app
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import android.net.VpnService
 import android.os.Bundle
 import android.widget.Toast
@@ -18,6 +23,8 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -26,10 +33,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -38,6 +49,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -61,10 +73,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.kitconnvpn.presentation.components.AnimatedMapRouteView
+import com.kitconnvpn.BuildConfig
 import com.kitconnvpn.KitConnVpnService
 import com.kitconnvpn.core.model.VpnConfig
 import com.kitconnvpn.VpnState
+import com.kitconnvpn.presentation.components.CountryFlag
+import com.kitconnvpn.presentation.components.VpnKnob
 import com.kitconnvpn.VpnStateRepository
 import com.kitconnvpn.presentation.components.SplashScreen
 import com.kitconnvpn.presentation.main.MainAction
@@ -78,8 +92,18 @@ class MainActivity : ComponentActivity() {
 
     private var pendingVlessUrl: String? = null
 
+    private val notificationPermission =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) !=
+            PackageManager.PERMISSION_GRANTED
+        ) {
+            notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
         enableEdgeToEdge()
 
         setContent {
@@ -100,21 +124,12 @@ class MainActivity : ComponentActivity() {
                     }
                     false -> {
                         Crossfade(
-                            targetState = uiState.isUpdateRequired to uiState.isRouteAnimating,
+                            targetState = uiState.isUpdateRequired,
                             label = "screen_transition"
-                        ) { (updateReq, animating) ->
+                        ) { updateReq ->
                             if (updateReq) {
                                 UpdateRequiredScreen(
                                     onRefresh = { viewModel.onAction(MainAction.RefreshConfigs) }
-                                )
-                            } else if (animating) {
-                                AnimatedMapRouteView(
-                                    originCity = "Россия (RU)",
-                                    destCountry = uiState.selectedConfig?.country ?: "Нидерланды",
-                                    destFlag = uiState.selectedConfig?.let { viewModel.getCountryFlag(it.country) }
-                                        ?: "🇳🇱",
-                                    progress = uiState.routeProgress,
-                                    isSuccessFlash = uiState.isSuccessFlash
                                 )
                             } else {
                                 VpnMainScreen(
@@ -151,7 +166,8 @@ class MainActivity : ComponentActivity() {
         val intent = Intent(this, KitConnVpnService::class.java).apply {
             putExtra(KitConnVpnService.EXTRA_VLESS_URL, vlessUrl)
         }
-        startService(intent)
+        // Сервис становится foreground (уведомление в статус-баре) сразу при старте
+        ContextCompat.startForegroundService(this, intent)
     }
 
     private fun stopVpnService() {
@@ -171,11 +187,9 @@ class MainActivity : ComponentActivity() {
     ) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if (requestCode == VPN_REQUEST_CODE && resultCode == RESULT_OK) {
-            pendingVlessUrl?.let { url ->
-                VpnStateRepository.startConnectingAnimation {
-                    startVpnService(url)
-                }
+        if (requestCode == VPN_REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                pendingVlessUrl?.let { startVpnService(it) }
             }
             pendingVlessUrl = null
         }
@@ -383,7 +397,7 @@ fun VpnMainScreen(
                         color = Color.White
                     )
                     Text(
-                        text = "Версия: v3.0.1",
+                        text = "Версия: v${BuildConfig.VERSION_NAME}",
                         style = MaterialTheme.typography.bodySmall,
                         color = Color(0xFF8A93A6)
                     )
@@ -424,106 +438,81 @@ fun VpnMainScreen(
                 }
             }
 
-            Column(
-                verticalArrangement = Arrangement.spacedBy(10.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    PillMetricCard(
-                        title = "Upload",
-                        value = if (uiState.vpnState == VpnState.CONNECTED) "${uiState.uploadSpeedMb} KB/S" else "0 KB/S",
-                        arrowIcon = "↑",
-                        modifier = Modifier.weight(1f)
-                    )
-                    PillMetricCard(
-                        title = "Download",
-                        value = if (uiState.vpnState == VpnState.CONNECTED) "${uiState.downloadSpeedMb} KB/S" else "0 KB/S",
-                        arrowIcon = "↓",
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    PillMetricCard(
-                        title = "Ping",
-                        value = if (uiState.vpnState == VpnState.CONNECTED && uiState.pingMs > 0) "${uiState.pingMs} ms" else "--",
-                        arrowIcon = "⚡",
-                        modifier = Modifier.weight(1f)
-                    )
-                    PillMetricCard(
-                        title = "Traffic",
-                        value = if (uiState.vpnState == VpnState.CONNECTED) String.format(Locale.US, "%.1f MB", uiState.totalTrafficMb) else "0 MB",
-                        arrowIcon = "⇄",
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-
-                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                    Surface(
-                        shape = RoundedCornerShape(20.dp),
-                        color = Color(0xFF141724),
-                        border = BorderStroke(1.dp, Color(0xFF22283C))
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Text(text = "🌐", fontSize = 12.sp)
-                            val hostIp = viewModel.getServerHost() ?: "185.25.12.5"
-                            Text(
-                                text = "Your IP : $hostIp",
-                                style = MaterialTheme.typography.bodySmall,
-                                fontWeight = FontWeight.Medium,
-                                color = Color(0xFF00E5FF)
-                            )
-                        }
-                    }
-                }
-            }
-
+            // Таймер и ручка-переключатель
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-                modifier = Modifier.padding(vertical = 4.dp)
+                modifier = Modifier.fillMaxWidth()
             ) {
-                PowerButton(
-                    vpnState = uiState.vpnState,
-                    onClick = { onAction(MainAction.ToggleVpn) }
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
                 Text(
-                    text = when (uiState.vpnState) {
-                        VpnState.CONNECTED -> "Connected"
-                        VpnState.CONNECTING -> "Connecting..."
-                        VpnState.DISCONNECTED -> "Disconnected"
-                    },
-                    style = MaterialTheme.typography.bodySmall,
+                    text = "Connecting Time",
+                    style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Medium,
                     color = Color(0xFF8A93A6)
                 )
 
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
                     text = if (uiState.vpnState == VpnState.CONNECTED) {
                         viewModel.formatDuration(uiState.durationSeconds)
                     } else {
-                        "00 : 00 : 00"
+                        "00:00:00"
                     },
-                    style = MaterialTheme.typography.headlineMedium.copy(
-                        fontFamily = FontFamily.Monospace
-                    ),
-                    fontWeight = FontWeight.Bold,
+                    fontSize = 56.sp,
+                    fontFamily = FontFamily.Monospace,
+                    fontWeight = FontWeight.Black,
                     color = Color.White
+                )
+
+                Spacer(modifier = Modifier.height(32.dp))
+
+                val isOn = uiState.vpnState != VpnState.DISCONNECTED
+                Row(
+                    modifier = Modifier.width(260.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = "Off",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Black,
+                        color = if (isOn) Color(0xFF546E7A) else Color.White
+                    )
+                    Text(
+                        text = "On",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Black,
+                        color = if (isOn) Color.White else Color(0xFF546E7A)
+                    )
+                }
+
+                VpnKnob(
+                    vpnState = uiState.vpnState,
+                    onToggle = { onAction(MainAction.ToggleVpn) }
+                )
+            }
+
+            // Скорость
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                SpeedColumn(
+                    title = "Download",
+                    arrowIcon = "↓",
+                    value = if (uiState.vpnState == VpnState.CONNECTED) "${uiState.downloadSpeedMb} KB/s" else "0 KB/s",
+                    modifier = Modifier.weight(1f)
+                )
+                Box(
+                    modifier = Modifier
+                        .width(1.dp)
+                        .height(48.dp)
+                        .background(Color(0xFF262A3E))
+                )
+                SpeedColumn(
+                    title = "Upload",
+                    arrowIcon = "↑",
+                    value = if (uiState.vpnState == VpnState.CONNECTED) "${uiState.uploadSpeedMb} KB/s" else "0 KB/s",
+                    modifier = Modifier.weight(1f)
                 )
             }
 
@@ -607,6 +596,38 @@ fun VpnMainScreen(
             },
             onDismiss = { onAction(MainAction.SetBottomSheetVisible(false)) },
             viewModel = viewModel
+        )
+    }
+}
+
+@Composable
+private fun SpeedColumn(
+    title: String,
+    arrowIcon: String,
+    value: String,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            Text(text = arrowIcon, color = Color(0xFF8A93A6), fontSize = 14.sp)
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color(0xFF8A93A6)
+            )
+        }
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = value,
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+            color = Color.White
         )
     }
 }
@@ -842,14 +863,21 @@ fun CountrySelectorSheet(
         }
     }
 
+    // Сразу раскрываем на всю высоту, без промежуточной половины экрана
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
     ModalBottomSheet(
         onDismissRequest = onDismiss,
-        containerColor = Color(0xFF161824),
+        sheetState = sheetState,
+        // Шит рисуется поверх окна: без отступа он залезает под статус-бар
+        modifier = Modifier.statusBarsPadding(),
+        containerColor = Color(0xFF0C0D14),
         contentColor = Color.White
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .fillMaxHeight()
                 .padding(horizontal = 20.dp, vertical = 12.dp)
         ) {
             Row(
@@ -904,97 +932,98 @@ fun CountrySelectorSheet(
             }
 
             LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.padding(bottom = 24.dp)
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.weight(1f),
+                contentPadding = PaddingValues(bottom = 24.dp)
             ) {
                 items(configs) { item ->
                     val isSelected = item == selectedConfig
                     val flag = viewModel.getCountryFlag(item.country)
                     val pingValue = serverPings[item.config]
 
-                    Surface(
-                        onClick = {
-                            onSelect(item)
-                            onDismiss()
-                        },
-                        shape = RoundedCornerShape(16.dp),
-                        color = if (isSelected) Color(0xFF222B3D) else Color(0xFF10141D),
-                        border = BorderStroke(
-                            1.dp,
-                            if (isSelected) Color(0xFF00E676) else Color(0xFF262A3E)
-                        ),
-                        modifier = Modifier.fillMaxWidth()
+                    // Полупрозрачная «стеклянная» карточка: круглый флаг, подпись и крупное название
+                    val cardShape = RoundedCornerShape(28.dp)
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(cardShape)
+                            .background(
+                                Brush.verticalGradient(
+                                    listOf(Color(0xFF181B28), Color(0xFF10121B))
+                                )
+                            )
+                            .border(
+                                width = if (isSelected) 1.5.dp else 1.dp,
+                                color = if (isSelected) Color(0xFF84F938) else Color(0xFF232739),
+                                shape = cardShape
+                            )
+                            .clickable {
+                                onSelect(item)
+                                onDismiss()
+                            }
+                            .padding(horizontal = 20.dp, vertical = 18.dp)
                     ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(14.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
+                        Column {
                             Row(
+                                modifier = Modifier.fillMaxWidth(),
                                 verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(14.dp),
-                                modifier = Modifier.weight(1f)
+                                horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                Text(
-                                    text = flag,
-                                    fontSize = 28.sp
-                                )
-                                Column {
+                                CountryFlag(flagEmoji = flag)
+
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                                ) {
+                                    if (serverPings.containsKey(item.config) && pingValue == null && isPingingAll) {
+                                        CircularProgressIndicator(
+                                            modifier = Modifier.size(14.dp),
+                                            color = Color(0xFF00E5FF),
+                                            strokeWidth = 2.dp
+                                        )
+                                    } else {
+                                        val pingText = when {
+                                            pingValue == null -> ""
+                                            pingValue > 0 -> "$pingValue мс"
+                                            else -> "n/a"
+                                        }
+                                        val pingColor = when {
+                                            pingValue == null -> Color(0xFF8A93A6)
+                                            pingValue in 1..250 -> Color(0xFF00E676)
+                                            pingValue in 251..500 -> Color(0xFFFFB300)
+                                            pingValue > 500 -> Color(0xFFFF5252)
+                                            else -> Color(0xFF8A93A6)
+                                        }
+                                        Text(
+                                            text = pingText,
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = pingColor,
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                    }
+
                                     Text(
-                                        text = item.name.ifEmpty { item.country },
-                                        style = MaterialTheme.typography.bodyLarge,
-                                        fontWeight = FontWeight.SemiBold,
-                                        color = Color.White
-                                    )
-                                    Text(
-                                        text = item.subtitle.ifEmpty { "VLESS" },
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = Color(0xFF8A93A6)
+                                        text = if (isSelected) "✓" else "•••",
+                                        color = if (isSelected) Color(0xFF84F938) else Color(0xFF8A93A6),
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = if (isSelected) 20.sp else 14.sp
                                     )
                                 }
                             }
 
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                if (serverPings.containsKey(item.config) && pingValue == null && isPingingAll) {
-                                    CircularProgressIndicator(
-                                        modifier = Modifier.size(14.dp),
-                                        color = Color(0xFF00E5FF),
-                                        strokeWidth = 2.dp
-                                    )
-                                } else {
-                                    val pingText = when {
-                                        pingValue == null -> ""
-                                        pingValue > 0 -> "$pingValue мс"
-                                        else -> "n/a"
-                                    }
-                                    val pingColor = when {
-                                        pingValue == null -> Color(0xFF8A93A6)
-                                        pingValue in 1..250 -> Color(0xFF00E676)
-                                        pingValue in 251..500 -> Color(0xFFFFB300)
-                                        pingValue > 500 -> Color(0xFFFF5252)
-                                        else -> Color(0xFF8A93A6)
-                                    }
+                            Spacer(modifier = Modifier.height(18.dp))
 
-                                    Text(
-                                        text = pingText,
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = pingColor,
-                                        fontWeight = FontWeight.Medium
-                                    )
-                                }
-
-                                Text(
-                                    text = if (isSelected) "✓" else "›",
-                                    color = if (isSelected) Color(0xFF00E676) else Color(0xFF546E7A),
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = if (isSelected) 18.sp else 20.sp
-                                )
-                            }
+                            Text(
+                                text = item.subtitle.ifEmpty { "Location" },
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = Color(0xFFB4BBCB)
+                            )
+                            Text(
+                                text = item.name.ifEmpty { item.country },
+                                style = MaterialTheme.typography.headlineSmall,
+                                fontWeight = FontWeight.Medium,
+                                color = Color.White
+                            )
                         }
                     }
                 }

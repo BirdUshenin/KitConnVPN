@@ -10,6 +10,15 @@ data class VlessConfig(
     val parameters: Map<String, String>,
     val name: String?
 ) {
+    val flow: String?
+        get() = parameters["flow"]
+
+    val allowInsecure: Boolean
+        get() = parameters["allowInsecure"].let { it == "1" || it == "true" }
+
+    val alpn: List<String>
+        get() = parameters["alpn"]?.split(',')?.filter { it.isNotBlank() }.orEmpty()
+
     val serverName: String?
         get() = parameters["sni"]
 

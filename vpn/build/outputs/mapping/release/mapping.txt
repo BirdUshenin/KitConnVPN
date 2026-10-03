@@ -1,0 +1,327 @@
+# compiler: R8
+# compiler_version: 9.1.31
+# common_typos_disable
+# {"id":"com.android.tools.r8.mapping","version":"2.2"}
+# pg_map_id: cf7fe573994c3ed7d64efff625e069e9ea6422fa100f19b0c0e67cc5ce4ed8cb
+# pg_map_hash: SHA-256 cf7fe573994c3ed7d64efff625e069e9ea6422fa100f19b0c0e67cc5ce4ed8cb
+com.kitconnvpn.KitConnVpnService -> com.kitconnvpn.KitConnVpnService:
+# {"id":"sourceFile","fileName":"KitConnVpnService.kt"}
+    android.os.ParcelFileDescriptor vpnInterface -> a
+    com.kitconnvpn.XrayManager xrayManager -> b
+      # {"id":"com.android.tools.r8.residualsignature","signature":"La/i;"}
+    1:1:void <init>():8:8 -> <init>
+    1:4:void stopVpn():86:89 -> a
+    5:12:void com.kitconnvpn.XrayManager.stop():45:52 -> a
+    5:12:void stopVpn():89 -> a
+    13:25:void stopVpn():91:103 -> a
+    26:28:void com.kitconnvpn.VpnStateRepository.onVpnStopped():177:179 -> a
+    26:28:void stopVpn():104 -> a
+    29:34:void com.kitconnvpn.VpnStateRepository.stopTimer():277:282 -> a
+    29:34:void com.kitconnvpn.VpnStateRepository.onVpnStopped():180 -> a
+    29:34:void stopVpn():104 -> a
+    1:2:void onDestroy():108:109 -> onDestroy
+    1:3:void onRevoke():80:82 -> onRevoke
+    1:11:int onStartCommand(android.content.Intent,int,int):18:28 -> onStartCommand
+    12:13:void com.kitconnvpn.VpnStateRepository.onVpnStarting():126:127 -> onStartCommand
+    12:13:int onStartCommand(android.content.Intent,int,int):32 -> onStartCommand
+    14:25:int onStartCommand(android.content.Intent,int,int):34:45 -> onStartCommand
+    26:48:int onStartCommand(android.content.Intent,int,int):44:66 -> onStartCommand
+    49:50:void com.kitconnvpn.XrayManager.start(java.lang.String,int):37:38 -> onStartCommand
+    49:50:int onStartCommand(android.content.Intent,int,int):64 -> onStartCommand
+    51:55:int onStartCommand(android.content.Intent,int,int):69:73 -> onStartCommand
+com.kitconnvpn.VlessConfig -> a.a:
+# {"id":"sourceFile","fileName":"VlessConfig.kt"}
+    java.lang.String uuid -> a
+    java.lang.String address -> b
+    int port -> c
+    java.lang.String encryption -> d
+    java.lang.String security -> e
+    java.lang.String type -> f
+    java.util.Map parameters -> g
+      # {"id":"com.android.tools.r8.residualsignature","signature":"Ljava/util/LinkedHashMap;"}
+    java.lang.String name -> h
+    1:9:void <init>(java.lang.String,java.lang.String,int,java.lang.String,java.lang.String,java.lang.String,java.util.Map,java.lang.String):3:11 -> <init>
+      # {"id":"com.android.tools.r8.residualsignature","signature":"(Ljava/lang/String;Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/LinkedHashMap;Ljava/lang/String;)V"}
+    1:1:boolean equals(java.lang.Object):0:0 -> equals
+    1:1:int hashCode():0:0 -> hashCode
+    1:1:java.lang.String toString():0:0 -> toString
+com.kitconnvpn.VlessParser -> a.b:
+# {"id":"sourceFile","fileName":"VlessParser.kt"}
+    1:39:com.kitconnvpn.VlessConfig parse(java.lang.String):8:46 -> a
+      # {"id":"com.android.tools.r8.residualsignature","signature":"(Ljava/lang/String;)La/a;"}
+    40:60:com.kitconnvpn.VlessConfig parse(java.lang.String):26:46 -> a
+    61:69:com.kitconnvpn.VlessConfig parse(java.lang.String):29:37 -> a
+    70:70:com.kitconnvpn.VlessConfig parse(java.lang.String):29:29 -> a
+    71:72:com.kitconnvpn.VlessConfig parse(java.lang.String):22:23 -> a
+    73:73:com.kitconnvpn.VlessConfig parse(java.lang.String):18:18 -> a
+    74:74:com.kitconnvpn.VlessConfig parse(java.lang.String):14:14 -> a
+    75:75:com.kitconnvpn.VlessConfig parse(java.lang.String):10:10 -> a
+com.kitconnvpn.VpnState -> a.c:
+# {"id":"sourceFile","fileName":"VpnStateRepository.kt"}
+    com.kitconnvpn.VpnState DISCONNECTED -> a
+      # {"id":"com.android.tools.r8.residualsignature","signature":"La/c;"}
+    com.kitconnvpn.VpnState CONNECTING -> b
+      # {"id":"com.android.tools.r8.residualsignature","signature":"La/c;"}
+    com.kitconnvpn.VpnState CONNECTED -> c
+      # {"id":"com.android.tools.r8.residualsignature","signature":"La/c;"}
+    com.kitconnvpn.VpnState[] $VALUES -> d
+      # {"id":"com.android.tools.r8.residualsignature","signature":"[La/c;"}
+    1:3:void <clinit>():21:23 -> <clinit>
+    4:4:com.kitconnvpn.VpnState[] $values():0:0 -> <clinit>
+    4:4:void <clinit>():23 -> <clinit>
+    5:5:void <clinit>():23:23 -> <clinit>
+    1:1:void <init>(java.lang.String,int):20:20 -> <init>
+    1:1:com.kitconnvpn.VpnState valueOf(java.lang.String):0:0 -> valueOf
+      # {"id":"com.android.tools.r8.residualsignature","signature":"(Ljava/lang/String;)La/c;"}
+    1:1:com.kitconnvpn.VpnState[] values():0:0 -> values
+      # {"id":"com.android.tools.r8.residualsignature","signature":"()[La/c;"}
+com.kitconnvpn.VpnStateRepository -> a.f:
+# {"id":"sourceFile","fileName":"VpnStateRepository.kt"}
+    kotlinx.coroutines.flow.MutableStateFlow _vpnState -> a
+    kotlinx.coroutines.flow.MutableStateFlow _isRouteAnimating -> b
+    kotlinx.coroutines.flow.MutableStateFlow _isSuccessFlash -> c
+    kotlinx.coroutines.flow.MutableStateFlow _durationSeconds -> d
+    kotlinx.coroutines.flow.MutableStateFlow _downloadSpeedMb -> e
+    kotlinx.coroutines.flow.MutableStateFlow _uploadSpeedMb -> f
+    kotlinx.coroutines.flow.MutableStateFlow _pingMs -> g
+    kotlinx.coroutines.flow.MutableStateFlow _totalTrafficMb -> h
+    kotlinx.coroutines.flow.MutableStateFlow _selectedConfig -> i
+    kotlinx.coroutines.Job timerJob -> j
+    kotlinx.coroutines.CoroutineScope scope -> k
+    1:48:void <clinit>():28:75 -> <clinit>
+    1:2:void onVpnStarted():132:133 -> a
+    3:8:void stopTimer():277:282 -> a
+    3:8:void startTimer():184 -> a
+    3:8:void onVpnStarted():134 -> a
+    9:10:void startTimer():185:186 -> a
+    9:10:void onVpnStarted():134 -> a
+    11:12:long getSystemRxBytes():235:236 -> a
+    11:12:void startTimer():188 -> a
+    11:12:void onVpnStarted():134 -> a
+    13:14:long getSystemTxBytes():240:241 -> a
+    13:14:void startTimer():189 -> a
+    13:14:void onVpnStarted():134 -> a
+    15:18:void startTimer():191:194 -> a
+    15:18:void onVpnStarted():134 -> a
+com.kitconnvpn.VpnStateRepository$measureRealPing$2 -> a.d:
+# {"id":"sourceFile","fileName":"VpnStateRepository.kt"}
+    java.lang.String $host -> a
+    int $port -> b
+    1:1:void <init>(java.lang.String,int,kotlin.coroutines.Continuation):0:0 -> <init>
+    1:1:kotlin.coroutines.Continuation create(java.lang.Object,kotlin.coroutines.Continuation):0:0 -> create
+    1:1:kotlin.coroutines.Continuation create(java.lang.Object,kotlin.coroutines.Continuation):0:0 -> invoke
+    1:1:java.lang.Object invoke(kotlinx.coroutines.CoroutineScope,kotlin.coroutines.Continuation):0 -> invoke
+    1:1:java.lang.Object invoke(java.lang.Object,java.lang.Object):0 -> invoke
+    2:2:java.lang.Object invoke(kotlinx.coroutines.CoroutineScope,kotlin.coroutines.Continuation):0:0 -> invoke
+    2:2:java.lang.Object invoke(java.lang.Object,java.lang.Object):0 -> invoke
+    1:6:java.lang.Object invokeSuspend(java.lang.Object):263:268 -> invokeSuspend
+    7:10:java.lang.Object invokeSuspend(java.lang.Object):266:269 -> invokeSuspend
+    11:16:java.lang.Object invokeSuspend(java.lang.Object):266:271 -> invokeSuspend
+com.kitconnvpn.VpnStateRepository$startTimer$1 -> a.e:
+# {"id":"sourceFile","fileName":"VpnStateRepository.kt"}
+    java.lang.Object L$1 -> a
+    int I$0 -> b
+    int label -> c
+    java.lang.Object L$0 -> d
+    kotlin.jvm.internal.Ref$LongRef $lastRx -> e
+    kotlin.jvm.internal.Ref$LongRef $lastTx -> f
+    long $initialRx -> g
+    long $initialTx -> h
+    1:1:void <init>(kotlin.jvm.internal.Ref$LongRef,kotlin.jvm.internal.Ref$LongRef,long,long,kotlin.coroutines.Continuation):0:0 -> <init>
+    1:1:kotlin.coroutines.Continuation create(java.lang.Object,kotlin.coroutines.Continuation):0:0 -> create
+    1:1:java.lang.Object invoke(kotlinx.coroutines.CoroutineScope,kotlin.coroutines.Continuation):0:0 -> invoke
+    1:1:java.lang.Object invoke(java.lang.Object,java.lang.Object):0 -> invoke
+    1:5:java.lang.Object invokeSuspend(java.lang.Object):194:198 -> invokeSuspend
+    6:6:kotlinx.coroutines.flow.MutableStateFlow com.kitconnvpn.VpnStateRepository.access$get_durationSeconds$p():26:26 -> invokeSuspend
+    6:6:java.lang.Object invokeSuspend(java.lang.Object):199 -> invokeSuspend
+    7:7:java.lang.Object invokeSuspend(java.lang.Object):199:199 -> invokeSuspend
+    8:9:long com.kitconnvpn.VpnStateRepository.getSystemRxBytes():235:236 -> invokeSuspend
+    8:9:long com.kitconnvpn.VpnStateRepository.access$getSystemRxBytes(com.kitconnvpn.VpnStateRepository):26 -> invokeSuspend
+    8:9:java.lang.Object invokeSuspend(java.lang.Object):201 -> invokeSuspend
+    10:11:long com.kitconnvpn.VpnStateRepository.getSystemTxBytes():240:241 -> invokeSuspend
+    10:11:long com.kitconnvpn.VpnStateRepository.access$getSystemTxBytes(com.kitconnvpn.VpnStateRepository):26 -> invokeSuspend
+    10:11:java.lang.Object invokeSuspend(java.lang.Object):202 -> invokeSuspend
+    12:16:java.lang.Object invokeSuspend(java.lang.Object):204:208 -> invokeSuspend
+    17:17:kotlinx.coroutines.flow.MutableStateFlow com.kitconnvpn.VpnStateRepository.access$get_downloadSpeedMb$p():26:26 -> invokeSuspend
+    17:17:java.lang.Object invokeSuspend(java.lang.Object):213 -> invokeSuspend
+    18:18:java.lang.Object invokeSuspend(java.lang.Object):213:213 -> invokeSuspend
+    19:19:kotlinx.coroutines.flow.MutableStateFlow com.kitconnvpn.VpnStateRepository.access$get_uploadSpeedMb$p():26:26 -> invokeSuspend
+    19:19:java.lang.Object invokeSuspend(java.lang.Object):214 -> invokeSuspend
+    20:23:java.lang.Object invokeSuspend(java.lang.Object):214:217 -> invokeSuspend
+    24:24:kotlinx.coroutines.flow.MutableStateFlow com.kitconnvpn.VpnStateRepository.access$get_totalTrafficMb$p():26:26 -> invokeSuspend
+    24:24:java.lang.Object invokeSuspend(java.lang.Object):220 -> invokeSuspend
+    25:27:java.lang.Object invokeSuspend(java.lang.Object):220:222 -> invokeSuspend
+    28:28:java.lang.String com.kitconnvpn.VpnStateRepository.getServerHost():245:245 -> invokeSuspend
+    28:28:java.lang.Object invokeSuspend(java.lang.Object):223 -> invokeSuspend
+    29:29:java.lang.String com.kitconnvpn.core.model.VpnConfig.getConfig():11:11 -> invokeSuspend
+    29:29:java.lang.String com.kitconnvpn.VpnStateRepository.getServerHost():245 -> invokeSuspend
+    29:29:java.lang.Object invokeSuspend(java.lang.Object):223 -> invokeSuspend
+    30:30:java.lang.String com.kitconnvpn.VpnStateRepository.getServerHost():247:247 -> invokeSuspend
+    30:30:java.lang.Object invokeSuspend(java.lang.Object):223 -> invokeSuspend
+    31:31:java.lang.String com.kitconnvpn.VlessConfig.getAddress():5:5 -> invokeSuspend
+    31:31:java.lang.String com.kitconnvpn.VpnStateRepository.getServerHost():247 -> invokeSuspend
+    31:31:java.lang.Object invokeSuspend(java.lang.Object):223 -> invokeSuspend
+    32:32:java.lang.Object invokeSuspend(java.lang.Object):224:224 -> invokeSuspend
+    33:33:int com.kitconnvpn.VpnStateRepository.getServerPort():254:254 -> invokeSuspend
+    33:33:int com.kitconnvpn.VpnStateRepository.access$getServerPort(com.kitconnvpn.VpnStateRepository):26 -> invokeSuspend
+    33:33:java.lang.Object invokeSuspend(java.lang.Object):224 -> invokeSuspend
+    34:34:java.lang.String com.kitconnvpn.core.model.VpnConfig.getConfig():11:11 -> invokeSuspend
+    34:34:int com.kitconnvpn.VpnStateRepository.getServerPort():254 -> invokeSuspend
+    34:34:int com.kitconnvpn.VpnStateRepository.access$getServerPort(com.kitconnvpn.VpnStateRepository):26 -> invokeSuspend
+    34:34:java.lang.Object invokeSuspend(java.lang.Object):224 -> invokeSuspend
+    35:35:int com.kitconnvpn.VpnStateRepository.getServerPort():256:256 -> invokeSuspend
+    35:35:int com.kitconnvpn.VpnStateRepository.access$getServerPort(com.kitconnvpn.VpnStateRepository):26 -> invokeSuspend
+    35:35:java.lang.Object invokeSuspend(java.lang.Object):224 -> invokeSuspend
+    36:36:int com.kitconnvpn.VlessConfig.getPort():6:6 -> invokeSuspend
+    36:36:int com.kitconnvpn.VpnStateRepository.getServerPort():256 -> invokeSuspend
+    36:36:int com.kitconnvpn.VpnStateRepository.access$getServerPort(com.kitconnvpn.VpnStateRepository):26 -> invokeSuspend
+    36:36:java.lang.Object invokeSuspend(java.lang.Object):224 -> invokeSuspend
+    37:37:java.lang.Object invokeSuspend(java.lang.Object):224:224 -> invokeSuspend
+    38:38:java.lang.Object com.kitconnvpn.VpnStateRepository.measureRealPing(java.lang.String,int,kotlin.coroutines.Continuation):263:263 -> invokeSuspend
+    38:38:java.lang.Object com.kitconnvpn.VpnStateRepository.access$measureRealPing(com.kitconnvpn.VpnStateRepository,java.lang.String,int,kotlin.coroutines.Continuation):26 -> invokeSuspend
+    38:38:java.lang.Object invokeSuspend(java.lang.Object):224 -> invokeSuspend
+    39:39:java.lang.Object invokeSuspend(java.lang.Object):224:224 -> invokeSuspend
+    40:40:kotlinx.coroutines.flow.MutableStateFlow com.kitconnvpn.VpnStateRepository.access$get_pingMs$p():26:26 -> invokeSuspend
+    40:40:java.lang.Object invokeSuspend(java.lang.Object):226 -> invokeSuspend
+    41:46:java.lang.Object invokeSuspend(java.lang.Object):226:231 -> invokeSuspend
+com.kitconnvpn.XrayConfigBuilder -> a.g:
+# {"id":"sourceFile","fileName":"XrayConfigBuilder.kt"}
+    1:1:java.lang.String build(com.kitconnvpn.VlessConfig):10:10 -> a
+      # {"id":"com.android.tools.r8.residualsignature","signature":"(La/a;)Ljava/lang/String;"}
+    2:2:java.lang.String com.kitconnvpn.VlessConfig.getServerName():14:14 -> a
+    2:2:java.lang.String build(com.kitconnvpn.VlessConfig):11 -> a
+      # {"id":"com.android.tools.r8.rewriteFrame","conditions":["throws(Ljava/lang/NullPointerException;)"],"actions":["removeInnerFrames(1)"]}
+    3:3:java.lang.String com.kitconnvpn.VlessConfig.getServerName():14:14 -> a
+    3:3:java.lang.String build(com.kitconnvpn.VlessConfig):11 -> a
+    4:5:java.lang.String build(com.kitconnvpn.VlessConfig):11:12 -> a
+    6:6:java.lang.String com.kitconnvpn.VlessConfig.getFingerprint():17:17 -> a
+    6:6:java.lang.String build(com.kitconnvpn.VlessConfig):12 -> a
+    7:7:java.lang.String build(com.kitconnvpn.VlessConfig):12:12 -> a
+    8:8:java.lang.String com.kitconnvpn.VlessConfig.getPublicKey():20:20 -> a
+    8:8:java.lang.String build(com.kitconnvpn.VlessConfig):13 -> a
+    9:9:java.lang.String build(com.kitconnvpn.VlessConfig):13:13 -> a
+    10:10:java.lang.String com.kitconnvpn.VlessConfig.getShortId():23:23 -> a
+    10:10:java.lang.String build(com.kitconnvpn.VlessConfig):14 -> a
+    11:11:java.lang.String build(com.kitconnvpn.VlessConfig):14:14 -> a
+    12:12:java.lang.String com.kitconnvpn.VlessConfig.getSpiderX():26:26 -> a
+    12:12:java.lang.String build(com.kitconnvpn.VlessConfig):15 -> a
+    13:25:java.lang.String build(com.kitconnvpn.VlessConfig):15:27 -> a
+    26:26:java.lang.String com.kitconnvpn.VlessConfig.getAddress():5:5 -> a
+    26:26:java.lang.String build(com.kitconnvpn.VlessConfig):28 -> a
+    27:27:java.lang.String build(com.kitconnvpn.VlessConfig):28:28 -> a
+    28:28:int com.kitconnvpn.VlessConfig.getPort():6:6 -> a
+    28:28:java.lang.String build(com.kitconnvpn.VlessConfig):29 -> a
+    29:34:java.lang.String build(com.kitconnvpn.VlessConfig) -> a
+    35:35:java.lang.String com.kitconnvpn.VlessConfig.getUuid():4:4 -> a
+    35:35:java.lang.String build(com.kitconnvpn.VlessConfig):35 -> a
+    36:36:java.lang.String build(com.kitconnvpn.VlessConfig):35:35 -> a
+    37:37:java.lang.String com.kitconnvpn.VlessConfig.getEncryption():7:7 -> a
+    37:37:java.lang.String build(com.kitconnvpn.VlessConfig):36 -> a
+    38:39:java.lang.String build(com.kitconnvpn.VlessConfig):36:37 -> a
+    40:40:java.lang.String build(com.kitconnvpn.VlessConfig):33:33 -> a
+    41:41:java.lang.String build(com.kitconnvpn.VlessConfig):31:31 -> a
+    42:42:java.lang.String build(com.kitconnvpn.VlessConfig):26:26 -> a
+    43:43:java.lang.String build(com.kitconnvpn.VlessConfig):24:24 -> a
+    44:71:java.lang.String build(com.kitconnvpn.VlessConfig):21:48 -> a
+    72:72:java.lang.String com.kitconnvpn.VlessConfig.getType():9:9 -> a
+    72:72:java.lang.String build(com.kitconnvpn.VlessConfig):49 -> a
+    73:73:java.lang.String build(com.kitconnvpn.VlessConfig):49:49 -> a
+    74:74:java.lang.String com.kitconnvpn.VlessConfig.getSecurity():8:8 -> a
+    74:74:java.lang.String build(com.kitconnvpn.VlessConfig):50 -> a
+    75:75:java.lang.String build(com.kitconnvpn.VlessConfig):50:50 -> a
+    76:76:java.lang.String com.kitconnvpn.VlessConfig.getSecurity():8:8 -> a
+    76:76:java.lang.String build(com.kitconnvpn.VlessConfig):52 -> a
+    77:78:java.lang.String build(com.kitconnvpn.VlessConfig):52:53 -> a
+    79:79:java.lang.String com.kitconnvpn.VlessConfig.getSecurity():8:8 -> a
+    79:79:java.lang.String build(com.kitconnvpn.VlessConfig):59 -> a
+    80:83:java.lang.String build(com.kitconnvpn.VlessConfig):59:62 -> a
+    84:84:java.lang.String com.kitconnvpn.VlessConfig.getServerName():14:14 -> a
+    84:84:java.lang.String build(com.kitconnvpn.VlessConfig):63 -> a
+    85:85:java.lang.String build(com.kitconnvpn.VlessConfig):64:64 -> a
+    86:86:java.lang.String com.kitconnvpn.VlessConfig.getFingerprint():17:17 -> a
+    86:86:java.lang.String build(com.kitconnvpn.VlessConfig):67 -> a
+    87:87:java.lang.String build(com.kitconnvpn.VlessConfig):68:68 -> a
+    88:88:java.lang.String build(com.kitconnvpn.VlessConfig):60:60 -> a
+    89:89:java.lang.String com.kitconnvpn.VlessConfig.getType():9:9 -> a
+    89:89:java.lang.String build(com.kitconnvpn.VlessConfig):74 -> a
+    90:92:java.lang.String build(com.kitconnvpn.VlessConfig):74:76 -> a
+    93:93:java.util.Map com.kitconnvpn.VlessConfig.getParameters():10:10 -> a
+    93:93:org.json.JSONObject com.kitconnvpn.XrayConfigBuilderKt.buildXhttpSettings(com.kitconnvpn.VlessConfig):122 -> a
+      # {"id":"com.android.tools.r8.rewriteFrame","conditions":["throws(Ljava/lang/NullPointerException;)"],"actions":["removeInnerFrames(1)"]}
+    93:93:org.json.JSONObject com.kitconnvpn.XrayConfigBuilderKt.access$buildXhttpSettings(com.kitconnvpn.VlessConfig):1 -> a
+    93:93:java.lang.String build(com.kitconnvpn.VlessConfig):77 -> a
+    94:95:org.json.JSONObject com.kitconnvpn.XrayConfigBuilderKt.buildXhttpSettings(com.kitconnvpn.VlessConfig):124:125 -> a
+    94:95:org.json.JSONObject com.kitconnvpn.XrayConfigBuilderKt.access$buildXhttpSettings(com.kitconnvpn.VlessConfig):1 -> a
+    94:95:java.lang.String build(com.kitconnvpn.VlessConfig):77 -> a
+    96:96:java.lang.String com.kitconnvpn.VlessConfig.getServerName():14:14 -> a
+    96:96:org.json.JSONObject com.kitconnvpn.XrayConfigBuilderKt.buildXhttpSettings(com.kitconnvpn.VlessConfig):125 -> a
+    96:96:org.json.JSONObject com.kitconnvpn.XrayConfigBuilderKt.access$buildXhttpSettings(com.kitconnvpn.VlessConfig):1 -> a
+    96:96:java.lang.String build(com.kitconnvpn.VlessConfig):77 -> a
+    97:97:java.lang.String com.kitconnvpn.VlessConfig.getAddress():5:5 -> a
+    97:97:org.json.JSONObject com.kitconnvpn.XrayConfigBuilderKt.buildXhttpSettings(com.kitconnvpn.VlessConfig):125 -> a
+    97:97:org.json.JSONObject com.kitconnvpn.XrayConfigBuilderKt.access$buildXhttpSettings(com.kitconnvpn.VlessConfig):1 -> a
+    97:97:java.lang.String build(com.kitconnvpn.VlessConfig):77 -> a
+    98:109:org.json.JSONObject com.kitconnvpn.XrayConfigBuilderKt.buildXhttpSettings(com.kitconnvpn.VlessConfig):125:136 -> a
+    98:109:org.json.JSONObject com.kitconnvpn.XrayConfigBuilderKt.access$buildXhttpSettings(com.kitconnvpn.VlessConfig):1 -> a
+    98:109:java.lang.String build(com.kitconnvpn.VlessConfig):77 -> a
+    110:110:java.lang.String build(com.kitconnvpn.VlessConfig):75:75 -> a
+    111:158:java.lang.String build(com.kitconnvpn.VlessConfig):46:93 -> a
+    159:159:java.lang.String build(com.kitconnvpn.VlessConfig):91:91 -> a
+    160:160:java.lang.String build(com.kitconnvpn.VlessConfig):87:87 -> a
+    161:180:java.lang.String build(com.kitconnvpn.VlessConfig):85:104 -> a
+    181:181:java.lang.String build(com.kitconnvpn.VlessConfig):101:101 -> a
+    182:195:java.lang.String build(com.kitconnvpn.VlessConfig):99:112 -> a
+    196:202:java.lang.String build(com.kitconnvpn.VlessConfig):109:115 -> a
+com.kitconnvpn.XrayConfigBuilderKt -> R8$$REMOVED$$CLASS$$0:
+# {"id":"sourceFile","fileName":"XrayConfigBuilder.kt"}
+com.kitconnvpn.XrayManager -> a.i:
+# {"id":"sourceFile","fileName":"XrayManager.kt"}
+    com.kitconnvpn.XrayManager$callback$1 callback -> a
+      # {"id":"com.android.tools.r8.residualsignature","signature":"La/h;"}
+    libv2ray.CoreController controller -> b
+    1:3:void <init>():8:10 -> <init>
+com.kitconnvpn.XrayManager$callback$1 -> a.h:
+# {"id":"sourceFile","fileName":"XrayManager.kt"}
+    1:1:void <init>():10:10 -> <init>
+    1:1:long onEmitStatus(long,java.lang.String):16:16 -> onEmitStatus
+    1:1:long shutdown():21:21 -> shutdown
+    1:1:long startup():26:26 -> startup
+com.kitconnvpn.core.model.VpnConfig -> b.c:
+# {"id":"sourceFile","fileName":"VpnConfig.kt"}
+    com.kitconnvpn.core.model.VpnConfig$Companion Companion -> Companion
+      # {"id":"com.android.tools.r8.residualsignature","signature":"Lb/b;"}
+    int version -> a
+    java.lang.String country -> b
+    java.lang.String name -> c
+    java.lang.String subtitle -> d
+    java.lang.String config -> e
+    1:1:void <clinit>():0:0 -> <clinit>
+    1:1:void <init>(int,int,java.lang.String,java.lang.String,java.lang.String,java.lang.String,kotlinx.serialization.internal.SerializationConstructorMarker):5:5 -> <init>
+      # {"id":"com.android.tools.r8.residualsignature","signature":"(IILjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V"}
+    1:1:boolean equals(java.lang.Object):0:0 -> equals
+    1:1:int hashCode():0:0 -> hashCode
+    1:1:java.lang.String toString():0:0 -> toString
+com.kitconnvpn.core.model.VpnConfig$$serializer -> b.a:
+# {"id":"sourceFile","fileName":"VpnConfig.kt"}
+    com.kitconnvpn.core.model.VpnConfig$$serializer INSTANCE -> a
+      # {"id":"com.android.tools.r8.residualsignature","signature":"Lb/a;"}
+    1:1:void <clinit>():5:5 -> <clinit>
+    1:1:void <init>():0:0 -> <init>
+    1:1:kotlinx.serialization.KSerializer[] childSerializers():5:5 -> childSerializers
+    1:6:com.kitconnvpn.core.model.VpnConfig deserialize(kotlinx.serialization.encoding.Decoder):0:5 -> deserialize
+    1:6:java.lang.Object deserialize(kotlinx.serialization.encoding.Decoder):5 -> deserialize
+    1:1:kotlinx.serialization.descriptors.SerialDescriptor getDescriptor():0:0 -> getDescriptor
+    1:1:void serialize(kotlinx.serialization.encoding.Encoder,java.lang.Object):5:5 -> serialize
+    2:7:void serialize(kotlinx.serialization.encoding.Encoder,com.kitconnvpn.core.model.VpnConfig):0:5 -> serialize
+    2:7:void serialize(kotlinx.serialization.encoding.Encoder,java.lang.Object):5 -> serialize
+    8:8:void com.kitconnvpn.core.model.VpnConfig.write$Self$vpn(com.kitconnvpn.core.model.VpnConfig,kotlinx.serialization.encoding.CompositeEncoder,kotlinx.serialization.descriptors.SerialDescriptor):5:5 -> serialize
+    8:8:void serialize(kotlinx.serialization.encoding.Encoder,com.kitconnvpn.core.model.VpnConfig):5 -> serialize
+    8:8:void serialize(kotlinx.serialization.encoding.Encoder,java.lang.Object):5 -> serialize
+    9:9:void serialize(kotlinx.serialization.encoding.Encoder,com.kitconnvpn.core.model.VpnConfig):5:5 -> serialize
+    9:9:void serialize(kotlinx.serialization.encoding.Encoder,java.lang.Object):5 -> serialize
+com.kitconnvpn.core.model.VpnConfig$Companion -> b.b:
+# {"id":"sourceFile","fileName":"VpnConfig.kt"}
+    1:1:void <init>():0:0 -> <init>
+    1:1:void <init>(kotlin.jvm.internal.DefaultConstructorMarker):0 -> <init>
+      # {"id":"com.android.tools.r8.residualsignature","signature":"()V"}
+    1:1:kotlinx.serialization.KSerializer serializer():5:5 -> serializer

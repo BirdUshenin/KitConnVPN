@@ -1,0 +1,156 @@
+com.kitconnvpn.KitConnVpnService:
+    public static final java.lang.String ACTION_STOP
+    public static final java.lang.String EXTRA_VLESS_URL
+    private static final java.lang.String TAG
+com.kitconnvpn.VlessConfig:
+    public final java.lang.String component1()
+    public final java.lang.String component2()
+    public final int component3()
+    public final java.lang.String component4()
+    public final java.lang.String component5()
+    public final java.lang.String component6()
+    public final java.util.Map component7()
+    public final java.lang.String component8()
+    public final com.kitconnvpn.VlessConfig copy(java.lang.String,java.lang.String,int,java.lang.String,java.lang.String,java.lang.String,java.util.Map,java.lang.String)
+    public static synthetic com.kitconnvpn.VlessConfig copy$default(com.kitconnvpn.VlessConfig,java.lang.String,java.lang.String,int,java.lang.String,java.lang.String,java.lang.String,java.util.Map,java.lang.String,int,java.lang.Object)
+    public final java.lang.String getName()
+com.kitconnvpn.VpnState:
+    public static kotlin.enums.EnumEntries getEntries()
+com.kitconnvpn.VpnStateRepository$pingAllServers$1$1$1
+com.kitconnvpn.VpnStateRepository$pingAllServers$1
+com.kitconnvpn.VpnStateRepository$startConnectingAnimation$1
+com.kitconnvpn.VpnStateRepository:
+    public static final synthetic kotlinx.coroutines.flow.MutableStateFlow access$get_isPingingAll$p()
+    public static final synthetic kotlinx.coroutines.flow.MutableStateFlow access$get_isRouteAnimating$p()
+    public static final synthetic kotlinx.coroutines.flow.MutableStateFlow access$get_isSuccessFlash$p()
+    public static final synthetic kotlinx.coroutines.flow.MutableStateFlow access$get_routeProgress$p()
+    public static final synthetic kotlinx.coroutines.flow.MutableStateFlow access$get_serverPings$p()
+    public static final synthetic kotlinx.coroutines.flow.MutableStateFlow access$get_vpnState$p()
+    public static final synthetic void access$startTimer(com.kitconnvpn.VpnStateRepository)
+    public final java.lang.String formatDuration(long)
+    public final kotlinx.coroutines.flow.StateFlow getConfigs()
+    public final java.lang.String getCountryFlag(java.lang.String)
+    public final kotlinx.coroutines.flow.StateFlow getDownloadSpeedMb()
+    public final kotlinx.coroutines.flow.StateFlow getDurationSeconds()
+    public final kotlinx.coroutines.flow.StateFlow getPingMs()
+    public final kotlinx.coroutines.flow.StateFlow getRouteProgress()
+    public final kotlinx.coroutines.flow.StateFlow getSelectedConfig()
+    public final kotlinx.coroutines.flow.StateFlow getServerPings()
+    public final kotlinx.coroutines.flow.StateFlow getTotalTrafficMb()
+    public final kotlinx.coroutines.flow.StateFlow getUploadSpeedMb()
+    public final kotlinx.coroutines.flow.StateFlow getVpnState()
+    public final kotlinx.coroutines.flow.StateFlow isLoadingConfigs()
+    public final kotlinx.coroutines.flow.StateFlow isPingingAll()
+    public final kotlinx.coroutines.flow.StateFlow isRouteAnimating()
+    public final kotlinx.coroutines.flow.StateFlow isSuccessFlash()
+    public final kotlinx.coroutines.flow.StateFlow isUpdateRequired()
+    public final void pingAllServers()
+    public final void selectConfig(com.kitconnvpn.core.model.VpnConfig)
+    public final void setConfigs(java.util.List)
+    public final void setLoadingConfigs(boolean)
+    public final void setRequireUpdate(boolean)
+    public final void startConnectingAnimation(kotlin.jvm.functions.Function0)
+com.kitconnvpn.XrayManager:
+    private static final java.lang.String TAG
+com.kitconnvpn.core.model.VpnConfig:
+    public void <init>(int,java.lang.String,java.lang.String,java.lang.String,java.lang.String)
+    public final int component1()
+    public final java.lang.String component2()
+    public final java.lang.String component3()
+    public final java.lang.String component4()
+    public final java.lang.String component5()
+    public final com.kitconnvpn.core.model.VpnConfig copy(int,java.lang.String,java.lang.String,java.lang.String,java.lang.String)
+    public static synthetic com.kitconnvpn.core.model.VpnConfig copy$default(com.kitconnvpn.core.model.VpnConfig,int,java.lang.String,java.lang.String,java.lang.String,java.lang.String,int,java.lang.Object)
+    public final java.lang.String getCountry()
+    public final java.lang.String getName()
+    public final java.lang.String getSubtitle()
+    public final int getVersion()
+com.kitconnvpn.core.model.VpnConfigsResponse$$serializer
+com.kitconnvpn.core.model.VpnConfigsResponse$Companion
+com.kitconnvpn.core.model.VpnConfigsResponse
+com.kitconnvpn.vpn.R:
+    private void <init>()
+com.kitconnvpn.KitConnVpnService$Companion
+com.kitconnvpn.KitConnVpnService:
+    public static final com.kitconnvpn.KitConnVpnService$Companion Companion
+    static void <clinit>()
+com.kitconnvpn.VlessConfig:
+    public static java.lang.String getAddress()
+    public static java.lang.String getEncryption()
+    public static java.lang.String getFingerprint()
+    public static java.util.Map getParameters()
+    public static int getPort()
+    public static java.lang.String getPublicKey()
+    public static java.lang.String getSecurity()
+    public static java.lang.String getServerName()
+    public static java.lang.String getShortId()
+    public static java.lang.String getSpiderX()
+    public static java.lang.String getType()
+    public static java.lang.String getUuid()
+com.kitconnvpn.VlessParser:
+    public static final com.kitconnvpn.VlessParser INSTANCE
+    static void <clinit>()
+    public void <init>()
+com.kitconnvpn.VpnState:
+    public static final synthetic kotlin.enums.EnumEntries $ENTRIES
+com.kitconnvpn.VpnStateRepository$measureRealPing$2:
+    public int label
+    public static java.lang.Object invoke()
+com.kitconnvpn.VpnStateRepository$startTimer$1:
+    public double D$0
+    public double D$1
+    public double D$2
+    public long J$0
+    public long J$1
+    public long J$2
+    public long J$3
+    public long J$4
+    public long J$5
+    public static java.lang.Object invoke()
+com.kitconnvpn.VpnStateRepository:
+    public static final com.kitconnvpn.VpnStateRepository INSTANCE
+    public static final kotlinx.coroutines.flow.MutableStateFlow _configs
+    public static final kotlinx.coroutines.flow.MutableStateFlow _isLoadingConfigs
+    public static final kotlinx.coroutines.flow.MutableStateFlow _isPingingAll
+    public static final kotlinx.coroutines.flow.MutableStateFlow _isUpdateRequired
+    public static final kotlinx.coroutines.flow.MutableStateFlow _routeProgress
+    public static final kotlinx.coroutines.flow.MutableStateFlow _serverPings
+    public static kotlinx.coroutines.Job animJob
+    public static final kotlinx.coroutines.flow.StateFlow configs
+    public static final kotlinx.coroutines.flow.StateFlow downloadSpeedMb
+    public static final kotlinx.coroutines.flow.StateFlow durationSeconds
+    public static final kotlinx.coroutines.flow.StateFlow isLoadingConfigs
+    public static final kotlinx.coroutines.flow.StateFlow isPingingAll
+    public static final kotlinx.coroutines.flow.StateFlow isRouteAnimating
+    public static final kotlinx.coroutines.flow.StateFlow isSuccessFlash
+    public static final kotlinx.coroutines.flow.StateFlow isUpdateRequired
+    public static final kotlinx.coroutines.flow.StateFlow pingMs
+    public static final kotlinx.coroutines.flow.StateFlow routeProgress
+    public static final kotlinx.coroutines.flow.StateFlow selectedConfig
+    public static final kotlinx.coroutines.flow.StateFlow serverPings
+    public static final kotlinx.coroutines.flow.StateFlow totalTrafficMb
+    public static final kotlinx.coroutines.flow.StateFlow uploadSpeedMb
+    public static final kotlinx.coroutines.flow.StateFlow vpnState
+    public void <init>()
+    public static java.lang.String getServerHost()
+    public static long getSystemRxBytes()
+    public static long getSystemTxBytes()
+    public static void onVpnStarting()
+    public static void onVpnStopped()
+    public static void stopTimer()
+com.kitconnvpn.XrayConfigBuilder:
+    public static final com.kitconnvpn.XrayConfigBuilder INSTANCE
+    static void <clinit>()
+    public void <init>()
+com.kitconnvpn.XrayConfigBuilderKt
+com.kitconnvpn.XrayManager$Companion
+com.kitconnvpn.XrayManager:
+    public static final com.kitconnvpn.XrayManager$Companion Companion
+    static void <clinit>()
+    public static void start()
+    public static void stop()
+com.kitconnvpn.core.model.VpnConfig$$serializer:
+    public static com.kitconnvpn.core.model.VpnConfig deserialize()
+    public static void serialize()
+com.kitconnvpn.core.model.VpnConfig:
+    public static java.lang.String getConfig()

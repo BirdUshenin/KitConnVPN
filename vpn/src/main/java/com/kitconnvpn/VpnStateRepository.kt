@@ -1,5 +1,7 @@
 package com.kitconnvpn
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.net.TrafficStats
 import android.os.Process
 import com.kitconnvpn.core.model.VpnConfig
@@ -27,15 +29,6 @@ object VpnStateRepository {
 
     private val _vpnState = MutableStateFlow(VpnState.DISCONNECTED)
     val vpnState: StateFlow<VpnState> = _vpnState.asStateFlow()
-
-    private val _isRouteAnimating = MutableStateFlow(false)
-    val isRouteAnimating: StateFlow<Boolean> = _isRouteAnimating.asStateFlow()
-
-    private val _routeProgress = MutableStateFlow(0f)
-    val routeProgress: StateFlow<Float> = _routeProgress.asStateFlow()
-
-    private val _isSuccessFlash = MutableStateFlow(false)
-    val isSuccessFlash: StateFlow<Boolean> = _isSuccessFlash.asStateFlow()
 
     private val _durationSeconds = MutableStateFlow(0L)
     val durationSeconds: StateFlow<Long> = _durationSeconds.asStateFlow()
@@ -71,7 +64,6 @@ object VpnStateRepository {
     val isUpdateRequired: StateFlow<Boolean> = _isUpdateRequired.asStateFlow()
 
     private var timerJob: Job? = null
-    private var animJob: Job? = null
     private val scope = CoroutineScope(Dispatchers.Main)
 
     fun setLoadingConfigs(loading: Boolean) {
@@ -82,16 +74,44 @@ object VpnStateRepository {
         _isUpdateRequired.value = required
     }
 
+    private var prefs: SharedPreferences? = null
+
+    /** Вызывается из Application: нужен, чтобы выбранный сервер пережил закрытие приложения. */
+    fun init(context: Context) {
+        prefs = context.applicationContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+    }
+
     fun setConfigs(list: List<VpnConfig>) {
         _configs.value = list
-        if (_selectedConfig.value == null && list.isNotEmpty()) {
-            _selectedConfig.value = list.first()
-        }
+        if (list.isEmpty()) return
+
+        // Текущий выбор мог пропасть из свежего списка — тогда берём сохранённый, потом первый
+        val current = _selectedConfig.value?.let { cur -> list.find { it.config == cur.config } }
+        _selectedConfig.value = current ?: restoreSelected(list) ?: list.first()
     }
 
     fun selectConfig(config: VpnConfig) {
         _selectedConfig.value = config
+        prefs?.edit()
+            ?.putString(KEY_SELECTED_URL, config.config)
+            ?.putString(KEY_SELECTED_NAME, config.name)
+            ?.apply()
     }
+
+    /** Ссылка последнего выбранного сервера: нужна виджету, когда процесс поднялся с нуля и список не загружен. */
+    fun savedConfigUrl(): String? = prefs?.getString(KEY_SELECTED_URL, null)
+
+    // Сначала по ссылке, затем по имени: ссылку на сервере могли поменять, а имя осталось
+    private fun restoreSelected(list: List<VpnConfig>): VpnConfig? {
+        val p = prefs ?: return null
+        val url = p.getString(KEY_SELECTED_URL, null)
+        val name = p.getString(KEY_SELECTED_NAME, null)
+        return list.find { it.config == url } ?: list.find { it.name == name && name != null }
+    }
+
+    private const val PREFS_NAME = "kitconn_prefs"
+    private const val KEY_SELECTED_URL = "selected_config_url"
+    private const val KEY_SELECTED_NAME = "selected_config_name"
 
     fun pingAllServers() {
         val currentConfigs = _configs.value
@@ -130,52 +150,10 @@ object VpnStateRepository {
 
     fun onVpnStarted() {
         _vpnState.value = VpnState.CONNECTED
-        if (!_isRouteAnimating.value) {
-            startTimer()
-        }
-    }
-
-    fun startConnectingAnimation(onStartService: () -> Unit) {
-        _vpnState.value = VpnState.CONNECTING
-        _isRouteAnimating.value = true
-        _routeProgress.value = 0f
-        _isSuccessFlash.value = false
-        stopTimer()
-
-        onStartService()
-
-        animJob?.cancel()
-        animJob = scope.launch {
-            val startTime = System.currentTimeMillis()
-            val totalAnimDuration = 3000L
-
-            while (isActive) {
-                val elapsed = System.currentTimeMillis() - startTime
-                val p = (elapsed.toFloat() / totalAnimDuration).coerceIn(0f, 1f)
-                _routeProgress.value = p
-
-                if (elapsed >= totalAnimDuration) {
-                    break
-                }
-                delay(16L)
-            }
-
-            _routeProgress.value = 1f
-            _isSuccessFlash.value = true
-            _vpnState.value = VpnState.CONNECTED
-            startTimer()
-
-            delay(1000L)
-            _isSuccessFlash.value = false
-            _isRouteAnimating.value = false
-        }
+        startTimer()
     }
 
     fun onVpnStopped() {
-        animJob?.cancel()
-        animJob = null
-        _isRouteAnimating.value = false
-        _isSuccessFlash.value = false
         _vpnState.value = VpnState.DISCONNECTED
         stopTimer()
     }

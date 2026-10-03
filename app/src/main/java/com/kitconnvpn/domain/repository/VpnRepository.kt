@@ -6,9 +6,6 @@ import kotlinx.coroutines.flow.StateFlow
 
 interface VpnRepository {
     val vpnState: StateFlow<VpnState>
-    val isRouteAnimating: StateFlow<Boolean>
-    val routeProgress: StateFlow<Float>
-    val isSuccessFlash: StateFlow<Boolean>
     val durationSeconds: StateFlow<Long>
     val downloadSpeedMb: StateFlow<String>
     val uploadSpeedMb: StateFlow<String>
@@ -24,7 +21,6 @@ interface VpnRepository {
     suspend fun fetchConfigs(appVersion: Int): Result<List<VpnConfig>>
     fun selectConfig(config: VpnConfig)
     fun pingAllServers()
-    fun startConnectingAnimation(onStartService: () -> Unit)
     fun onVpnStopped()
     fun getServerHost(): String?
     fun getCountryFlag(country: String): String

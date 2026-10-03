@@ -1,0 +1,8 @@
+com.kitconnvpn.KitConnVpnService
+com.kitconnvpn.vpn.R
+com.kitconnvpn.core.model.VpnConfig: com.kitconnvpn.core.model.VpnConfig$Companion Companion
+com.kitconnvpn.core.model.VpnConfig$$serializer: kotlinx.serialization.descriptors.SerialDescriptor descriptor
+com.kitconnvpn.core.model.VpnConfig$Companion: kotlinx.serialization.KSerializer serializer()
+com.kitconnvpn.VpnState: com.kitconnvpn.VpnState[] values()
+com.kitconnvpn.VpnState: com.kitconnvpn.VpnState valueOf(java.lang.String)
+com.kitconnvpn.KitConnVpnService: KitConnVpnService()

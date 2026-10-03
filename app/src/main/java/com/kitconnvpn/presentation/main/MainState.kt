@@ -17,8 +17,5 @@ data class MainUiState(
     val totalTrafficMb: Double = 0.0,
     val serverPings: Map<String, Int?> = emptyMap(),
     val isPingingAll: Boolean = false,
-    val isRouteAnimating: Boolean = false,
-    val routeProgress: Float = 0f,
-    val isSuccessFlash: Boolean = false,
     val showBottomSheet: Boolean = false
 )

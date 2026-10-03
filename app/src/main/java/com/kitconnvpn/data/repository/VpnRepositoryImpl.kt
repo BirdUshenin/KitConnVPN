@@ -12,9 +12,6 @@ class VpnRepositoryImpl(
     private val api: KitConnApi
 ) : VpnRepository {
     override val vpnState: StateFlow<VpnState> = VpnStateRepository.vpnState
-    override val isRouteAnimating: StateFlow<Boolean> = VpnStateRepository.isRouteAnimating
-    override val routeProgress: StateFlow<Float> = VpnStateRepository.routeProgress
-    override val isSuccessFlash: StateFlow<Boolean> = VpnStateRepository.isSuccessFlash
     override val durationSeconds: StateFlow<Long> = VpnStateRepository.durationSeconds
     override val downloadSpeedMb: StateFlow<String> = VpnStateRepository.downloadSpeedMb
     override val uploadSpeedMb: StateFlow<String> = VpnStateRepository.uploadSpeedMb
@@ -54,9 +51,6 @@ class VpnRepositoryImpl(
         VpnStateRepository.pingAllServers()
     }
 
-    override fun startConnectingAnimation(onStartService: () -> Unit) {
-        VpnStateRepository.startConnectingAnimation(onStartService)
-    }
 
     override fun onVpnStopped() {
         VpnStateRepository.onVpnStopped()

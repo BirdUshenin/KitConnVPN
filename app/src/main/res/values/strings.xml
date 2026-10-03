@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">KitConnVPN</string>
+    <string name="widget_description">Включение и выключение KitConn VPN</string>
 </resources>

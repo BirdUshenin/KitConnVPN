@@ -1,0 +1,8 @@
+com.kitconnvpn.vpn-pngs-0 /Users/ilya/AndroidStudioProjects/KitConnVPN/vpn/build/generated/res/pngs/release
+com.kitconnvpn.vpn-updated_navigation_xml-1 /Users/ilya/AndroidStudioProjects/KitConnVPN/vpn/build/generated/updated_navigation_xml/release
+com.kitconnvpn.vpn-mergeReleaseResources-2 /Users/ilya/AndroidStudioProjects/KitConnVPN/vpn/build/intermediates/incremental/release/mergeReleaseResources/merged.dir
+com.kitconnvpn.vpn-mergeReleaseResources-3 /Users/ilya/AndroidStudioProjects/KitConnVPN/vpn/build/intermediates/incremental/release/mergeReleaseResources/stripped.dir
+com.kitconnvpn.vpn-release-4 /Users/ilya/AndroidStudioProjects/KitConnVPN/vpn/build/intermediates/merged_res/release/mergeReleaseResources
+com.kitconnvpn.vpn-release-5 /Users/ilya/AndroidStudioProjects/KitConnVPN/vpn/build/intermediates/packaged_res/release/packageReleaseResources
+com.kitconnvpn.vpn-main-6 /Users/ilya/AndroidStudioProjects/KitConnVPN/vpn/src/main/res
+com.kitconnvpn.vpn-release-7 /Users/ilya/AndroidStudioProjects/KitConnVPN/vpn/src/release/res

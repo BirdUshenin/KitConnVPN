@@ -34,6 +34,7 @@ object XrayConfigBuilder {
                                         JSONObject().apply {
                                             put("id", config.uuid)
                                             put("encryption", config.encryption)
+                                            config.flow?.let { put("flow", it) }
                                         }
                                     )
                                 )
@@ -66,6 +67,14 @@ object XrayConfigBuilder {
 
                                 config.fingerprint?.let {
                                     put("fingerprint", it)
+                                }
+
+                                if (config.allowInsecure) {
+                                    put("allowInsecure", true)
+                                }
+
+                                if (config.alpn.isNotEmpty()) {
+                                    put("alpn", JSONArray(config.alpn))
                                 }
                             }
                         )
@@ -122,7 +131,7 @@ private fun buildXhttpSettings(
     val parameters = config.parameters
 
     return JSONObject().apply {
-        put("host", config.serverName ?: config.address)
+        put("host", parameters["host"] ?: config.serverName ?: config.address)
 
         parameters["path"]?.let {
             put("path", it)
