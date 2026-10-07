@@ -18,13 +18,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-// Отношение сторон полотна флага: круг показывает его центральную часть
 private const val FLAG_RATIO = 1.5f
 
-/**
- * Круглый флаг, нарисованный в Canvas. Код страны берётся из эмодзи-флага,
- * для стран без нарисованного флага остаётся эмодзи в круге.
- */
 @Composable
 fun CountryFlag(
     flagEmoji: String,
@@ -54,7 +49,6 @@ fun CountryFlag(
     ) {
         val h = this.size.height
         val w = h * FLAG_RATIO
-        // Сдвиг полотна: для большинства флагов — центр, у США слева, чтобы был виден синий угол
         val left = -(w - this.size.width) * painter.viewportStart
         painter.draw(this, left, w, h)
     }
@@ -73,7 +67,6 @@ private fun String.toCountryCode(): String? {
 private fun DrawScope.horizontal(left: Float, w: Float, h: Float, colors: List<Color>) {
     val band = h / colors.size
     colors.forEachIndexed { i, c ->
-        // +1 пиксель, чтобы между полосами не было щелей от округления
         drawRect(c, Offset(left, band * i), Size(w, band + 1f))
     }
 }
@@ -114,7 +107,6 @@ private val flagPainters: Map<String, FlagPainter> = mapOf(
         val cantonW = w * 0.45f
         val cantonH = stripe * 7
         drawRect(Color(0xFF3C3B6E), Offset(l, 0f), Size(cantonW, cantonH))
-        // Звёзды упрощены до точек: на таком размере звезда всё равно не читается
         val rows = 4
         val cols = 5
         val dot = stripe * 0.32f

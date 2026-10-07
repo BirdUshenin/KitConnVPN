@@ -51,7 +51,6 @@ class VpnRepositoryImpl(
         VpnStateRepository.pingAllServers()
     }
 
-
     override fun onVpnStopped() {
         VpnStateRepository.onVpnStopped()
     }

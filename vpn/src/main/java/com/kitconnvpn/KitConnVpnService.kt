@@ -1,6 +1,5 @@
 package com.kitconnvpn
 
-import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -10,6 +9,7 @@ import android.os.Build
 import android.net.VpnService
 import android.os.ParcelFileDescriptor
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import com.kitconnvpn.vpn.R
@@ -20,6 +20,7 @@ class KitConnVpnService : VpnService() {
     private var xrayManager: XrayManager? = null
     private var connectedAt = 0L
 
+    @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     override fun onStartCommand(
         intent: Intent?,
         flags: Int,
@@ -31,7 +32,6 @@ class KitConnVpnService : VpnService() {
             return START_NOT_STICKY
         }
 
-        // Сервис запущен через startForegroundService: уведомление нужно показать до любой работы
         showNotification(connected = false)
 
         val vlessUrl = intent?.getStringExtra(EXTRA_VLESS_URL)
@@ -90,16 +90,22 @@ class KitConnVpnService : VpnService() {
         return START_STICKY
     }
 
+    @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     private fun showNotification(connected: Boolean) {
-        val manager = getSystemService(NotificationManager::class.java)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            manager.createNotificationChannel(
-                NotificationChannel(CHANNEL_ID, "Статус VPN", NotificationManager.IMPORTANCE_LOW)
+        getSystemService(NotificationManager::class.java).createNotificationChannel(
+            NotificationChannel(
+                CHANNEL_ID,
+                "Статус VPN",
+                NotificationManager.IMPORTANCE_LOW
             )
-        }
-
+        )
         val openApp = packageManager.getLaunchIntentForPackage(packageName)?.let {
-            PendingIntent.getActivity(this, 0, it, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+            PendingIntent.getActivity(
+                this,
+                0,
+                it,
+                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+            )
         }
         val stopIntent = PendingIntent.getService(
             this,
@@ -129,25 +135,21 @@ class KitConnVpnService : VpnService() {
             .setOnlyAlertOnce(true)
             .setCategory(NotificationCompat.CATEGORY_SERVICE)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            // Тёмная подложка в цвет приложения; текст система подбирает светлый сама
             .setColor(BRAND_BACKGROUND)
             .setColorized(true)
             .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
 
         if (connected) {
-            // Системный секундомер времени подключения: тикает без обновлений уведомления
             builder.setUsesChronometer(true).setShowWhen(true).setWhen(connectedAt)
         } else {
             builder.setProgress(0, 0, true)
         }
-        val notification = builder.build()
-
-        val type = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        ServiceCompat.startForeground(
+            this,
+            NOTIFICATION_ID,
+            builder.build(),
             ServiceInfo.FOREGROUND_SERVICE_TYPE_SYSTEM_EXEMPTED
-        } else {
-            0
-        }
-        ServiceCompat.startForeground(this, NOTIFICATION_ID, notification, type)
+        )
     }
 
     override fun onRevoke() {

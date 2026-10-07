@@ -29,8 +29,6 @@ import kotlinx.coroutines.launch
 
 private val CatColor = Color(0xFF00E5FF)
 private val BackgroundColor = Color(0xFF0C0D14)
-
-// Геометрия кота в тех же координатах, что и в векторной иконке (viewport 108)
 private val CatCenter = Offset(54f, 52.5f)
 private const val CAT_UNITS = 60f
 private const val EYE_Y = 57f
@@ -44,7 +42,6 @@ fun SplashScreen(
 ) {
     val scale = remember { Animatable(0.4f) }
     val alpha = remember { Animatable(0f) }
-    // 0 — глаз открыт, 1 — прикрыт
     val wink = remember { Animatable(0f) }
 
     LaunchedEffect(Unit) {
@@ -61,7 +58,6 @@ fun SplashScreen(
             )
         }
         delay(750)
-        // Экран живёт, пока грузятся серверы, поэтому подмигиваем по кругу
         while (true) {
             wink.animateTo(1f, tween(110, easing = FastOutSlowInEasing))
             delay(140)
@@ -104,8 +100,6 @@ private fun DrawScope.drawCat(wink: Float) {
         }
         drawPath(ears, CatColor)
         drawOval(CatColor, Offset(30f, 36f), Size(48f, 42f))
-
-        // Левый глаз всегда открыт, правый подмигивает: сплющивается по вертикали
         drawEye(LEFT_EYE_X, 1f)
         drawEye(RIGHT_EYE_X, 1f - 0.85f * wink)
     }

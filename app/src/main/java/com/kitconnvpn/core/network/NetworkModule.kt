@@ -7,7 +7,7 @@ import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFact
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 
-private const val BASE_URL = "https://kitconn-api.ilyaushenin.ru/"
+private const val BASE_URL = "https://kitconn.ru/"
 private const val API_TOKEN = ""
 
 private val authInterceptor = Interceptor { chain ->

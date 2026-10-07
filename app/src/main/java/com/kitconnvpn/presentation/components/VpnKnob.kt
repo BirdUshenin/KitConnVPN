@@ -34,17 +34,12 @@ import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
 
-// Углы отсчитываются по часовой стрелке от направления «вверх»
 private const val ANGLE_OFF = -50f
 private const val ANGLE_ON = 50f
 private const val ANGLE_MID = (ANGLE_OFF + ANGLE_ON) / 2f
 private const val BODY_TEETH = 28
 private const val CAP_TEETH = 22
 
-/**
- * Ручка-переключатель Off/On. Положение всегда следует за [vpnState]: если разрешение VPN
- * не выдано и состояние не сменилось, ручка сама вернётся в «Off».
- */
 @Composable
 fun VpnKnob(
     vpnState: VpnState,
@@ -57,7 +52,6 @@ fun VpnKnob(
     val isOn = vpnState != VpnState.DISCONNECTED
     val targetAngle = if (isOn) ANGLE_ON else ANGLE_OFF
 
-    // Стартуем из «Off», чтобы при возврате на экран ручка плавно докручивалась до текущего положения
     val angle = remember { Animatable(ANGLE_OFF) }
     val spec = remember { spring<Float>(dampingRatio = Spring.DampingRatioLowBouncy, stiffness = Spring.StiffnessLow) }
 
@@ -114,7 +108,6 @@ private fun DrawScope.drawKnob(angleDeg: Float, indicatorColor: Color) {
     val center = Offset(size.width / 2f, size.height / 2f)
     val radius = size.minDimension / 2f * 0.86f
 
-    // Тень под ручкой
     drawCircle(
         brush = Brush.radialGradient(
             colors = listOf(Color(0x99000000), Color.Transparent),
@@ -126,7 +119,6 @@ private fun DrawScope.drawKnob(angleDeg: Float, indicatorColor: Color) {
     )
 
     rotate(angleDeg, center) {
-        // Зубчатое тело
         val body = gearPath(center, radius, radius * 0.93f, BODY_TEETH)
         drawPath(
             path = body,
@@ -136,7 +128,6 @@ private fun DrawScope.drawKnob(angleDeg: Float, indicatorColor: Color) {
                 radius = radius * 1.4f
             )
         )
-        // Скругляем зубья
         drawPath(body, Color(0xFF1A1C28), style = Stroke(width = radius * 0.03f, join = StrokeJoin.Round))
         drawCircle(
             color = Color(0x22FFFFFF),
@@ -145,7 +136,6 @@ private fun DrawScope.drawKnob(angleDeg: Float, indicatorColor: Color) {
             style = Stroke(width = 1.5f)
         )
 
-        // Индикатор
         val barW = radius * 0.1f
         val barH = radius * 0.3f
         val barTopLeft = Offset(center.x - barW / 2f, center.y - radius * 0.82f)
@@ -162,7 +152,6 @@ private fun DrawScope.drawKnob(angleDeg: Float, indicatorColor: Color) {
             cornerRadius = CornerRadius(barW / 2f)
         )
 
-        // Металлическая крышка
         val capR = radius * 0.3f
         val cap = gearPath(center, capR, capR * 0.9f, CAP_TEETH)
         drawPath(
@@ -184,7 +173,6 @@ private fun DrawScope.drawKnob(angleDeg: Float, indicatorColor: Color) {
     }
 }
 
-/** Контур шестерни: [teeth] зубьев между радиусами [outer] и [inner]. */
 private fun gearPath(center: Offset, outer: Float, inner: Float, teeth: Int): Path {
     val path = Path()
     val step = (2 * PI / teeth).toFloat()

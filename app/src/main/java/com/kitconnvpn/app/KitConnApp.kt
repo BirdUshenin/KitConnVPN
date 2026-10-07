@@ -27,9 +27,10 @@ class KitConnApp : Application() {
             modules(appModule)
         }
 
-        // Виджет живёт отдельно от активити, поэтому обновляем его от состояния репозитория
-        combine(VpnStateRepository.vpnState, VpnStateRepository.selectedConfig) { _, _ -> }
-            .onEach { VpnWidgetProvider.updateAll(this) }
+        combine(
+            flow = VpnStateRepository.vpnState,
+            flow2 = VpnStateRepository.selectedConfig
+        ) { _, _ -> }.onEach { VpnWidgetProvider.updateAll(this) }
             .launchIn(appScope)
     }
 }

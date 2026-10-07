@@ -76,7 +76,6 @@ object VpnStateRepository {
 
     private var prefs: SharedPreferences? = null
 
-    /** Вызывается из Application: нужен, чтобы выбранный сервер пережил закрытие приложения. */
     fun init(context: Context) {
         prefs = context.applicationContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
     }
@@ -85,7 +84,6 @@ object VpnStateRepository {
         _configs.value = list
         if (list.isEmpty()) return
 
-        // Текущий выбор мог пропасть из свежего списка — тогда берём сохранённый, потом первый
         val current = _selectedConfig.value?.let { cur -> list.find { it.config == cur.config } }
         _selectedConfig.value = current ?: restoreSelected(list) ?: list.first()
     }
@@ -98,10 +96,8 @@ object VpnStateRepository {
             ?.apply()
     }
 
-    /** Ссылка последнего выбранного сервера: нужна виджету, когда процесс поднялся с нуля и список не загружен. */
     fun savedConfigUrl(): String? = prefs?.getString(KEY_SELECTED_URL, null)
 
-    // Сначала по ссылке, затем по имени: ссылку на сервере могли поменять, а имя осталось
     private fun restoreSelected(list: List<VpnConfig>): VpnConfig? {
         val p = prefs ?: return null
         val url = p.getString(KEY_SELECTED_URL, null)

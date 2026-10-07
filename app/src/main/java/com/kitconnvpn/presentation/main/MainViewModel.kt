@@ -124,7 +124,6 @@ class MainViewModel(
                     loadConfigs()
                     return
                 }
-                // Анимацию запускает Activity уже после выдачи разрешения VPN
                 onStartService?.invoke(config.config)
             }
         }
