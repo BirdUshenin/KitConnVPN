@@ -110,7 +110,10 @@ class MainViewModel(
         }
     }
 
-    private fun handleToggleVpn(onStartService: ((String) -> Unit)?, onStopService: (() -> Unit)?) {
+    private fun handleToggleVpn(
+        onStartService: ((String) -> Unit)?,
+        onStopService: (() -> Unit)?
+    ) {
         when (_uiState.value.vpnState) {
             VpnState.CONNECTED, VpnState.CONNECTING -> {
                 onStopService?.invoke()

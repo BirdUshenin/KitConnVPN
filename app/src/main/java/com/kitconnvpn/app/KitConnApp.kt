@@ -30,7 +30,8 @@ class KitConnApp : Application() {
         combine(
             flow = VpnStateRepository.vpnState,
             flow2 = VpnStateRepository.selectedConfig
-        ) { _, _ -> }.onEach { VpnWidgetProvider.updateAll(this) }
-            .launchIn(appScope)
+        ) { _, _ -> }.onEach {
+            VpnWidgetProvider.updateAll(this)
+        }.launchIn(appScope)
     }
 }

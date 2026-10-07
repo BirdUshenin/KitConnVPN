@@ -30,6 +30,8 @@ import org.koin.androidx.compose.koinViewModel
 
 class MainActivity : ComponentActivity() {
 
+    private var pendingVlessUrl: String? = null
+
     private val vpnPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -41,7 +43,6 @@ class MainActivity : ComponentActivity() {
 
         pendingVlessUrl = null
     }
-    private var pendingVlessUrl: String? = null
 
     private val notificationPermission =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { }
@@ -93,8 +94,8 @@ class MainActivity : ComponentActivity() {
                                             onStartService = { url -> startVpn(url) },
                                             onStopService = { stopVpnService() }
                                         )
-                                    },
-                                    viewModel = viewModel
+                                    }
+//                                    viewModel = viewModel
                                 )
                             }
                         }

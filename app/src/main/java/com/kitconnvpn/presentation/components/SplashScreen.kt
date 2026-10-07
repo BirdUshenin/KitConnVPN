@@ -46,7 +46,13 @@ fun SplashScreen(
 
     LaunchedEffect(Unit) {
         launch {
-            alpha.animateTo(1f, tween(350, easing = LinearEasing))
+            alpha.animateTo(
+                targetValue = 1f,
+                animationSpec = tween(
+                    delayMillis = 350,
+                    easing = LinearEasing
+                )
+            )
         }
         launch {
             scale.animateTo(
@@ -59,9 +65,21 @@ fun SplashScreen(
         }
         delay(750)
         while (true) {
-            wink.animateTo(1f, tween(110, easing = FastOutSlowInEasing))
+            wink.animateTo(
+                targetValue = 1f,
+                animationSpec = tween(
+                    delayMillis = 110,
+                    easing = FastOutSlowInEasing
+                )
+            )
             delay(140)
-            wink.animateTo(0f, tween(160, easing = FastOutSlowInEasing))
+            wink.animateTo(
+                targetValue =0f,
+                animationSpec = tween(
+                    delayMillis = 160,
+                    easing = FastOutSlowInEasing
+                )
+            )
             delay(1900)
         }
     }
@@ -87,25 +105,56 @@ fun SplashScreen(
 }
 
 private fun DrawScope.drawCat(wink: Float) {
-    val unit = size.minDimension / CAT_UNITS
-
-    withTransform({
-        translate(size.width / 2f, size.height / 2f)
-        scale(unit, unit, pivot = Offset.Zero)
-        translate(-CatCenter.x, -CatCenter.y)
+    withTransform(transformBlock = {
+        translate(
+            left = size.width / 2f,
+            top = size.height / 2f
+        )
+        scale(
+            scaleX = size.minDimension / CAT_UNITS,
+            scaleY = size.minDimension / CAT_UNITS,
+            pivot = Offset.Zero
+        )
+        translate(
+            left = -CatCenter.x,
+            top = -CatCenter.y
+        )
     }) {
         val ears = Path().apply {
-            moveTo(31f, 52f); lineTo(29f, 27f); lineTo(49f, 37f); close()
-            moveTo(77f, 52f); lineTo(79f, 27f); lineTo(59f, 37f); close()
+            moveTo(x = 31f, y = 52f);
+            lineTo(x = 29f, y = 27f);
+            lineTo(x = 49f, y = 37f); close()
+            moveTo(x = 77f, y = 52f);
+            lineTo(x = 79f, y = 27f);
+            lineTo(x = 59f, y = 37f); close()
         }
-        drawPath(ears, CatColor)
-        drawOval(CatColor, Offset(30f, 36f), Size(48f, 42f))
-        drawEye(LEFT_EYE_X, 1f)
-        drawEye(RIGHT_EYE_X, 1f - 0.85f * wink)
+        drawPath(
+            path = ears,
+            color = CatColor
+        )
+        drawOval(
+            color = CatColor,
+            topLeft = Offset(
+                x = 30f,
+                y = 36f
+            ),
+            size = Size(width = 48f, height = 42f)
+        )
+        drawEye(
+            cx = LEFT_EYE_X,
+            openness = 1f
+        )
+        drawEye(
+            cx = RIGHT_EYE_X,
+            openness = 1f - 0.85f * wink
+        )
     }
 }
 
 private fun DrawScope.drawEye(cx: Float, openness: Float) {
     val h = EYE_R * openness
-    drawOval(BackgroundColor, Offset(cx - EYE_R, EYE_Y - h), Size(EYE_R * 2, h * 2))
+    drawOval(
+        color = BackgroundColor,
+        topLeft = Offset(cx - EYE_R, EYE_Y - h), Size(EYE_R * 2, h * 2)
+    )
 }

@@ -147,6 +147,8 @@ object VpnStateRepository {
     fun onVpnStarted() {
         _vpnState.value = VpnState.CONNECTED
         startTimer()
+
+
     }
 
     fun onVpnStopped() {

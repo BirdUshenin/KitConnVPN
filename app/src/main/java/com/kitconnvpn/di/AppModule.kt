@@ -16,5 +16,9 @@ val appModule = module {
     factory { GetVpnConfigsUseCase(get()) }
     factory { PingServersUseCase(get()) }
 
-    viewModel { MainViewModel(get(), get(), get()) }
+    viewModel { MainViewModel(
+        getVpnConfigsUseCase = get(),
+        pingServersUseCase = get(),
+        repository = get())
+    }
 }

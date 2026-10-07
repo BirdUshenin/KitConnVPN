@@ -42,6 +42,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kitconnvpn.BuildConfig
@@ -57,7 +58,7 @@ import kotlin.text.ifEmpty
 internal fun VpnMainScreen(
     uiState: MainUiState,
     onAction: (MainAction) -> Unit,
-    viewModel: MainViewModel
+//    viewModel: MainViewModel
 ) {
     val backgroundColor = Color(0xFF0C0D14)
 
@@ -143,7 +144,8 @@ internal fun VpnMainScreen(
 
                 Text(
                     text = if (uiState.vpnState == VpnState.CONNECTED) {
-                        viewModel.formatDuration(uiState.durationSeconds)
+//                        viewModel.formatDuration(uiState.durationSeconds)
+
                     } else {
                         "00:00:00"
                     },
@@ -245,8 +247,9 @@ internal fun VpnMainScreen(
 
                         Column {
                             Text(
-                                text = uiState.selectedConfig?.name?.ifEmpty { uiState.selectedConfig?.country }
-                                    ?: if (uiState.isLoadingConfigs) "Загрузка серверов..." else "Выберите локацию",
+                                text = uiState.selectedConfig?.name?.ifEmpty {
+                                    uiState.selectedConfig.country
+                                } ?: if (uiState.isLoadingConfigs) "Загрузка серверов..." else "Выберите локацию",
                                 style = MaterialTheme.typography.bodyLarge,
                                 fontWeight = FontWeight.Bold,
                                 color = Color.White
@@ -280,7 +283,7 @@ internal fun VpnMainScreen(
                 onAction(MainAction.SelectConfig(config))
             },
             onDismiss = { onAction(MainAction.SetBottomSheetVisible(false)) },
-            viewModel = viewModel
+//            viewModel = viewModel
         )
     }
 }
@@ -327,7 +330,7 @@ fun CountrySelectorSheet(
     onPingAll: () -> Unit,
     onSelect: (VpnConfig) -> Unit,
     onDismiss: () -> Unit,
-    viewModel: MainViewModel
+//    viewModel: MainViewModel
 ) {
     LaunchedEffect(Unit) {
         if (serverPings.isEmpty()) {
@@ -501,4 +504,14 @@ fun CountrySelectorSheet(
             }
         }
     }
+}
+
+@Preview(
+    name = "Galaxy S22 · A12 · 360×780 dp",
+    device = "spec:width=1080px,height=2340px,dpi=480",
+    showSystemUi = true
+)
+@Composable
+fun VpnMainScreenPreview() {
+
 }

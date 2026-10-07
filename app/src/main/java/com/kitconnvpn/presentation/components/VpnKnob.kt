@@ -86,7 +86,6 @@ fun VpnKnob(
                                 haptics.performHapticFeedback(HapticFeedbackType.LongPress)
                                 onToggle()
                             }
-                            // Если состояние не сменится (например, отказ в разрешении), ручка вернётся сама
                             angle.animateTo(targetAngle, spec)
                         }
                     },
