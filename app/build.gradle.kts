@@ -16,8 +16,8 @@ android {
         applicationId = "com.kitconnvpn"
         minSdk = 24
         targetSdk = 37
-        versionCode = 4
-        versionName = "4.0.0"
+        versionCode = 5
+        versionName = "4.0.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

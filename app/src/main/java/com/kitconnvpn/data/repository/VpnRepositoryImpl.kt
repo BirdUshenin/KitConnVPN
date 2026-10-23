@@ -29,18 +29,30 @@ class VpnRepositoryImpl(
         return try {
             val response = api.getConfigs(appVersion)
             VpnStateRepository.setRequireUpdate(false)
+            VpnStateRepository.saveCachedConfigs(response.configs)
             VpnStateRepository.setConfigs(response.configs)
             Result.success(response.configs)
         } catch (e: HttpException) {
             if (e.code() == 426) {
+                VpnStateRepository.clearCachedConfigs()
                 VpnStateRepository.setRequireUpdate(true)
+                Result.failure(e)
+            } else {
+                fromCacheOr(e)
             }
-            Result.failure(e)
         } catch (e: Exception) {
-            Result.failure(e)
+            fromCacheOr(e)
         } finally {
             VpnStateRepository.setLoadingConfigs(false)
         }
+    }
+
+    // Белые списки: API недоступен — работаем по последнему удачно загруженному списку
+    private fun fromCacheOr(error: Exception): Result<List<VpnConfig>> {
+        val cached = VpnStateRepository.loadCachedConfigs()
+        if (cached.isEmpty()) return Result.failure(error)
+        VpnStateRepository.setConfigs(cached)
+        return Result.success(cached)
     }
 
     override fun selectConfig(config: VpnConfig) {

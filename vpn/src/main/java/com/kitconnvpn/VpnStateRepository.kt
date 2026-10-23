@@ -15,6 +15,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.json.JSONArray
+import org.json.JSONObject
 import java.net.InetSocketAddress
 import java.net.Socket
 import java.util.Locale
@@ -88,6 +90,36 @@ object VpnStateRepository {
         _selectedConfig.value = current ?: restoreSelected(list) ?: list.first()
     }
 
+    /** Последний удачно загруженный список: под белыми списками API недоступен, и без кеша серверов не будет. */
+    fun saveCachedConfigs(list: List<VpnConfig>) {
+        val arr = JSONArray()
+        list.forEach {
+            arr.put(
+                JSONObject()
+                    .put("version", it.version).put("country", it.country).put("name", it.name)
+                    .put("subtitle", it.subtitle).put("config", it.config),
+            )
+        }
+        prefs?.edit()?.putString(KEY_CACHED_CONFIGS, arr.toString())?.apply()
+    }
+
+    fun loadCachedConfigs(): List<VpnConfig> {
+        val raw = prefs?.getString(KEY_CACHED_CONFIGS, null).orEmpty()
+        if (raw.isEmpty()) return emptyList()
+        return runCatching {
+            val arr = JSONArray(raw)
+            (0 until arr.length()).map {
+                val o = arr.getJSONObject(it)
+                VpnConfig(o.getInt("version"), o.getString("country"), o.getString("name"), o.getString("subtitle"), o.getString("config"))
+            }
+        }.getOrDefault(emptyList())
+    }
+
+    // Устаревшей версии кеш не отдаём, иначе блокировку по версии можно обойти
+    fun clearCachedConfigs() {
+        prefs?.edit()?.remove(KEY_CACHED_CONFIGS)?.apply()
+    }
+
     fun selectConfig(config: VpnConfig) {
         _selectedConfig.value = config
         prefs?.edit()
@@ -106,6 +138,7 @@ object VpnStateRepository {
     }
 
     private const val PREFS_NAME = "kitconn_prefs"
+    private const val KEY_CACHED_CONFIGS = "cached_configs"
     private const val KEY_SELECTED_URL = "selected_config_url"
     private const val KEY_SELECTED_NAME = "selected_config_name"
 
